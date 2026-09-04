@@ -11,6 +11,7 @@ const envSchema = z.object({
   PAYMENT_WEBHOOK_SIGNING_SECRET: z.string().optional(),
   ADMIN_SESSION_SECRET: z.string().min(32),
   MFA_ENCRYPTION_KEY: z.string().min(32),
+  IP_HASH_SALT: z.string().min(16),
   PIXEL_WALL_WIDTH: z.coerce.number().int().positive(),
   PIXEL_CHUNK_ROWS: z.coerce.number().int().positive(),
 });

@@ -8,6 +8,7 @@ const validEnv = {
   UPI_PAYEE_NAME: "1 Crore Pixels",
   ADMIN_SESSION_SECRET: "a".repeat(32),
   MFA_ENCRYPTION_KEY: "b".repeat(32),
+  IP_HASH_SALT: "c".repeat(16),
   PIXEL_WALL_WIDTH: "4000",
   PIXEL_CHUNK_ROWS: "25",
 };

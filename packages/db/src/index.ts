@@ -13,12 +13,19 @@ if (process.env.NODE_ENV !== "production") {
 
 export { Prisma, PrismaClient } from "@prisma/client";
 export type {
+  CampaignTotals,
   Contribution,
   ContributionStatus,
   Contributor,
+  Milestone,
   Payment,
   PaymentStatus,
   PixelAllocation,
+  PixelCursor,
+  Referral,
+  ReferralEvent,
+  ReferralEventType,
+  Update,
 } from "@prisma/client";
 
 // A DB client that can run queries — either the top-level PrismaClient or an

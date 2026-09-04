@@ -34,7 +34,7 @@ Both `apps/web` and, later, `apps/worker` connect to the same PostgreSQL instanc
 
 Per PRD §25 ("secrets in environment/secret manager," "no secrets in source control"):
 
-- All secrets (DB connection string, Redis connection string, payment provider keys/VPA, webhook signing secret (Phase 3), admin session signing key, MFA encryption key) are injected via the hosting platform's environment variable / secret manager mechanism, never committed.
+- All secrets (DB connection string, Redis connection string, payment provider keys/VPA, webhook signing secret (Phase 3), admin session signing key, MFA encryption key, IP/user-agent hash salt) are injected via the hosting platform's environment variable / secret manager mechanism, never committed.
 - `.env.example` (committed) documents required variable names with placeholder values only; `.env` / `.env.local` are gitignored.
 - Config values that are not secret but environment-dependent (e.g. wall width constant `W`, chunk size, feature flags for enabling `GatewayProvider`) are also environment-driven, not hardcoded, so staging can validate Phase 3 payment code before it's enabled in production.
 

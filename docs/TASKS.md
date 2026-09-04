@@ -72,19 +72,19 @@ Goal: the `PaymentProvider` interface and the MVP manual provider exist. Depends
 
 Goal: all public endpoints from `docs/API.md` §2 exist, tested, and response-allowlisted. Depends on Phases 2–3.
 
-- [ ] **T4.1** `POST /api/contributions` — validation, idempotency-key handling, contribution + contributor creation (`docs/API.md` §2.1).
-- [ ] **T4.2** `POST /api/contributions/{id}/qr` — payment attempt creation via `PaymentProvider`, state transition to `PAYMENT_PENDING` (`docs/API.md` §2.2).
-- [ ] **T4.3** `POST /api/contributions/{id}/utr` — records last-4, transitions to `VERIFYING`; must have **no code path** to `PAID` (`docs/API.md` §2.3, `docs/PAYMENT.md` §3).
-- [ ] **T4.4** `GET /api/contributions/{id}` — status polling with the exact allowlisted response shape (`docs/API.md` §2.4).
-- [ ] **T4.5** `GET /api/progress` — reads `campaign_totals` only, O(1) (`docs/API.md` §2.5).
-- [ ] **T4.6** `GET /api/pixels?chunk=` — range-intersection query per `docs/PIXEL_SYSTEM.md` §3.3 (`docs/API.md` §2.6).
-- [ ] **T4.7** `GET /api/pixels/{pixelId}` — single-pixel lookup per `docs/PIXEL_SYSTEM.md` §3.4 (`docs/API.md` §2.6.1).
-- [ ] **T4.8** `GET /api/contributors` — paginated public list + name search, `PUBLISHED`-only (`docs/API.md` §2.7).
-- [ ] **T4.9** `GET /api/referrals/{code}` + `POST /api/referrals/{code}/visit` (`docs/API.md` §2.8–2.8.1).
-- [ ] **T4.10** `GET /api/updates`, `GET /api/milestones` (`docs/API.md` §2.9).
-- [ ] **T4.11** Write the response-allowlisting integration test for every endpoint above (`docs/TESTING.md` §3) — must fail if an undocumented field appears in any response.
-- [ ] **T4.12** Apply rate limiting to the endpoints listed in `docs/SECURITY.md` §3.
-- [ ] **T4.13** Apply cache headers per `docs/DEPLOYMENT.md` §5 to the applicable public GET endpoints.
+- [x] **T4.1** `POST /api/contributions` — validation, idempotency-key handling, contribution + contributor creation (`docs/API.md` §2.1). Display-name moderation hold gap tracked as `docs/OPEN_ISSUES.md` OI-2.
+- [x] **T4.2** `POST /api/contributions/{id}/qr` — payment attempt creation via `PaymentProvider`, state transition to `PAYMENT_PENDING` (`docs/API.md` §2.2).
+- [x] **T4.3** `POST /api/contributions/{id}/utr` — records last-4, transitions to `VERIFYING`; must have **no code path** to `PAID` (`docs/API.md` §2.3, `docs/PAYMENT.md` §3).
+- [x] **T4.4** `GET /api/contributions/{id}` — status polling with the exact allowlisted response shape (`docs/API.md` §2.4).
+- [x] **T4.5** `GET /api/progress` — reads `campaign_totals` only, O(1) (`docs/API.md` §2.5).
+- [x] **T4.6** `GET /api/pixels?chunk=` — range-intersection query per `docs/PIXEL_SYSTEM.md` §3.3 (`docs/API.md` §2.6).
+- [x] **T4.7** `GET /api/pixels/{pixelId}` — single-pixel lookup per `docs/PIXEL_SYSTEM.md` §3.4 (`docs/API.md` §2.6.1).
+- [x] **T4.8** `GET /api/contributors` — paginated public list + name search, `PUBLISHED`-only (`docs/API.md` §2.7).
+- [x] **T4.9** `GET /api/referrals/{code}` + `POST /api/referrals/{code}/visit` (`docs/API.md` §2.8–2.8.1).
+- [x] **T4.10** `GET /api/updates`, `GET /api/milestones` (`docs/API.md` §2.9).
+- [x] **T4.11** Write the response-allowlisting integration test for every endpoint above (`docs/TESTING.md` §3) — must fail if an undocumented field appears in any response.
+- [x] **T4.12** Apply rate limiting to the endpoints listed in `docs/SECURITY.md` §3.
+- [x] **T4.13** Apply cache headers per `docs/DEPLOYMENT.md` §5 to the applicable public GET endpoints.
 
 ---
 

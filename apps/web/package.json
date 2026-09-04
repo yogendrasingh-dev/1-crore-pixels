@@ -16,6 +16,8 @@
     "@1crore-pixels/db": "workspace:*",
     "@1crore-pixels/payment-providers": "workspace:*",
     "@1crore-pixels/ui": "workspace:*",
+    "dotenv": "16.4.7",
+    "ioredis": "5.4.1",
     "next": "16.3.4",
     "react": "19.2.8",
     "react-dom": "19.2.8",
