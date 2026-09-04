@@ -27,17 +27,17 @@ Goal: a working, empty monorepo with tooling, schema, and CI in place. No produc
 Goal: the full schema from `docs/DATABASE.md` exists, migrated, and typed — no API or UI yet.
 
 - [x] **T1.1** Define Prisma schema for `contributions` + `contributors` (`docs/DATABASE.md` §3.1–3.2), including the `contribution_status` enum (§4).
-- [ ] **T1.2** Define Prisma schema for `payments`, including `payment_status` enum (`docs/DATABASE.md` §3.3, §4).
-- [ ] **T1.3** Define Prisma schema for `pixel_allocations` with the `int8range` generated column and GiST exclusion constraint (`docs/DATABASE.md` §3.4) — this constraint likely needs a raw SQL migration since Prisma does not natively express `EXCLUDE USING gist`; confirm and write it explicitly.
-- [ ] **T1.4** Define `pixel_cursor` and `campaign_totals` single-row tables with seed rows (`docs/DATABASE.md` §3.5–3.6).
-- [ ] **T1.5** Define `referrals` + `referral_events` (`docs/DATABASE.md` §3.7–3.8).
-- [ ] **T1.6** Define `badges` + `contributor_badges` (`docs/DATABASE.md` §3.9).
-- [ ] **T1.7** Define `updates` + `milestones` (`docs/DATABASE.md` §3.10–3.11).
-- [ ] **T1.8** Define `admin_users` + `admin_role` enum (`docs/DATABASE.md` §3.12).
-- [ ] **T1.9** Define `audit_logs`, append-only (no `UPDATE`/`DELETE` grant at the app DB role level) (`docs/DATABASE.md` §3.13).
-- [ ] **T1.10** Define `payment_webhook_events` (`docs/DATABASE.md` §3.14) — schema only, unused until Phase 11.
-- [ ] **T1.11** Write and run the initial migration; verify all indexes/constraints listed in `docs/DATABASE.md` §3 exist as specified.
-- [ ] **T1.12** Write a unit/integration test asserting the GiST exclusion constraint actually rejects an overlapping insert (`docs/TESTING.md` §4) — proves T1.3 before anything depends on it.
+- [x] **T1.2** Define Prisma schema for `payments`, including `payment_status` enum (`docs/DATABASE.md` §3.3, §4).
+- [x] **T1.3** Define Prisma schema for `pixel_allocations` with the `int8range` generated column and GiST exclusion constraint (`docs/DATABASE.md` §3.4) — this constraint likely needs a raw SQL migration since Prisma does not natively express `EXCLUDE USING gist`; confirm and write it explicitly.
+- [x] **T1.4** Define `pixel_cursor` and `campaign_totals` single-row tables with seed rows (`docs/DATABASE.md` §3.5–3.6).
+- [x] **T1.5** Define `referrals` + `referral_events` (`docs/DATABASE.md` §3.7–3.8).
+- [x] **T1.6** Define `badges` + `contributor_badges` (`docs/DATABASE.md` §3.9).
+- [x] **T1.7** Define `updates` + `milestones` (`docs/DATABASE.md` §3.10–3.11).
+- [x] **T1.8** Define `admin_users` + `admin_role` enum (`docs/DATABASE.md` §3.12).
+- [x] **T1.9** Define `audit_logs`, append-only (no `UPDATE`/`DELETE` grant at the app DB role level) (`docs/DATABASE.md` §3.13). DB-role grant restriction itself deferred — see `docs/OPEN_ISSUES.md` OI-1 (no application DB role is provisioned yet to revoke from).
+- [x] **T1.10** Define `payment_webhook_events` (`docs/DATABASE.md` §3.14) — schema only, unused until Phase 11.
+- [x] **T1.11** Write and run the initial migration; verify all indexes/constraints listed in `docs/DATABASE.md` §3 exist as specified.
+- [x] **T1.12** Write a unit/integration test asserting the GiST exclusion constraint actually rejects an overlapping insert (`docs/TESTING.md` §4) — proves T1.3 before anything depends on it.
 
 ---
 

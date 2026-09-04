@@ -26,49 +26,297 @@ enum ContributionStatus {
   @@map("contribution_status")
 }
 
+// docs/DATABASE.md §4
+enum PaymentStatus {
+  PENDING
+  SUBMITTED
+  VERIFIED
+  FAILED
+  EXPIRED
+
+  @@map("payment_status")
+}
+
+// docs/DATABASE.md §4
+enum ReferralEventType {
+  VISIT
+  CONTRIBUTION
+
+  @@map("referral_event_type")
+}
+
+// docs/DATABASE.md §4. Exact role set is Open Decision #6 (§9).
+enum AdminRole {
+  SUPER_ADMIN
+  VERIFIER
+  CONTENT_EDITOR
+
+  @@map("admin_role")
+}
+
 // docs/DATABASE.md §3.2. One row per contribution in MVP (Open Decision #1: §9.1).
 model Contributor {
-  id                        BigInt   @id @default(autoincrement())
-  displayName               String   @map("display_name")
-  anonymous                 Boolean  @default(false)
-  referralCode              String?  @unique @map("referral_code")
-  totalVerifiedAmountPaise  BigInt   @default(0) @map("total_verified_amount_paise")
-  totalPixels               BigInt   @default(0) @map("total_pixels")
-  createdAt                 DateTime @default(now()) @map("created_at") @db.Timestamptz
+  id                       BigInt   @id @default(autoincrement())
+  displayName              String   @map("display_name")
+  anonymous                Boolean  @default(false)
+  referralCode             String?  @unique @map("referral_code")
+  totalVerifiedAmountPaise BigInt   @default(0) @map("total_verified_amount_paise")
+  totalPixels              BigInt   @default(0) @map("total_pixels")
+  createdAt                DateTime @default(now()) @map("created_at") @db.Timestamptz
 
-  contributions Contribution[]
+  contributions     Contribution[]
+  referrals         Referral[]
+  contributorBadges ContributorBadge[]
 
   @@map("contributors")
+}
+
+// docs/DATABASE.md §3.9. Exact award rules are Open Decision #8 (docs/DATABASE.md §9,
+// PRD §36.12) — schema supports rule-based (`criteria`) evaluation without a migration
+// once rules are finalized; only seeded data changes.
+model Badge {
+  id          String   @id @default(uuid()) @db.Uuid
+  code        String   @unique
+  name        String
+  description String
+  criteria    Json
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  contributorBadges ContributorBadge[]
+
+  @@map("badges")
+}
+
+// docs/DATABASE.md §3.12. MFA-ready: `mfaSecretEncrypted` holds a TOTP secret
+// encrypted at rest (docs/SECURITY.md §5), never logged, never returned by any endpoint.
+model AdminUser {
+  id                 BigInt    @id @default(autoincrement())
+  email              String    @unique
+  passwordHash       String    @map("password_hash")
+  role               AdminRole
+  mfaEnabled         Boolean   @default(false) @map("mfa_enabled")
+  mfaSecretEncrypted String?   @map("mfa_secret_encrypted")
+  status             String    @default("ACTIVE")
+  createdAt          DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  lastLoginAt        DateTime? @map("last_login_at") @db.Timestamptz
+
+  verifiedPayments Payment[]
+  updates          Update[]
+  auditLogs        AuditLog[]
+
+  @@map("admin_users")
+}
+
+// docs/DATABASE.md §3.13, CLAUDE.md §6. Append-only: the application DB role has
+// no UPDATE/DELETE grant on this table (raw SQL in the migration; Prisma's schema
+// DSL has no concept of per-role grants), and no application code may write one.
+model AuditLog {
+  id          BigInt     @id @default(autoincrement())
+  adminUserId BigInt?    @map("admin_user_id")
+  adminUser   AdminUser? @relation(fields: [adminUserId], references: [id])
+  action      String
+  entityType  String     @map("entity_type")
+  entityId    String     @map("entity_id")
+  beforeState Json?      @map("before_state")
+  afterState  Json?      @map("after_state")
+  ipAddress   String?    @map("ip_address")
+  createdAt   DateTime   @default(now()) @map("created_at") @db.Timestamptz
+
+  @@map("audit_logs")
+}
+
+// docs/DATABASE.md §3.14. Phase 3/12 only — makes webhook processing idempotent
+// once a real payment gateway is introduced; unused by the MVP manual-UTR flow.
+model PaymentWebhookEvent {
+  id              BigInt    @id @default(autoincrement())
+  provider        String
+  providerEventId String    @map("provider_event_id")
+  payload         Json
+  signatureValid  Boolean   @map("signature_valid")
+  processedAt     DateTime? @map("processed_at") @db.Timestamptz
+  createdAt       DateTime  @default(now()) @map("created_at") @db.Timestamptz
+
+  @@unique([provider, providerEventId])
+  @@map("payment_webhook_events")
+}
+
+// docs/DATABASE.md §3.11. Admin-configurable per PRD §17.
+model Milestone {
+  id                String    @id @default(uuid()) @db.Uuid
+  label             String
+  targetAmountPaise BigInt?   @map("target_amount_paise")
+  phase             String
+  sortOrder         Int       @map("sort_order")
+  achievedAt        DateTime? @map("achieved_at") @db.Timestamptz
+  createdAt         DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt         DateTime  @updatedAt @map("updated_at") @db.Timestamptz
+
+  updates Update[]
+
+  @@map("milestones")
+}
+
+// docs/DATABASE.md §3.10
+model Update {
+  id               String     @id @default(uuid()) @db.Uuid
+  title            String
+  body             String
+  imageUrl         String?    @map("image_url")
+  milestoneId      String?    @map("milestone_id") @db.Uuid
+  milestone        Milestone? @relation(fields: [milestoneId], references: [id])
+  status           String
+  createdByAdminId BigInt     @map("created_by_admin_id")
+  createdByAdmin   AdminUser  @relation(fields: [createdByAdminId], references: [id])
+  publishedAt      DateTime?  @map("published_at") @db.Timestamptz
+  createdAt        DateTime   @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt        DateTime   @updatedAt @map("updated_at") @db.Timestamptz
+
+  @@map("updates")
+}
+
+// docs/DATABASE.md §3.9
+model ContributorBadge {
+  id            BigInt      @id @default(autoincrement())
+  contributorId BigInt      @map("contributor_id")
+  contributor   Contributor @relation(fields: [contributorId], references: [id])
+  badgeId       String      @map("badge_id") @db.Uuid
+  badge         Badge       @relation(fields: [badgeId], references: [id])
+  awardedAt     DateTime    @default(now()) @map("awarded_at") @db.Timestamptz
+
+  @@unique([contributorId, badgeId])
+  @@map("contributor_badges")
+}
+
+// docs/DATABASE.md §3.7
+model Referral {
+  id            BigInt      @id @default(autoincrement())
+  code          String      @unique
+  contributorId BigInt      @map("contributor_id")
+  contributor   Contributor @relation(fields: [contributorId], references: [id])
+  createdAt     DateTime    @default(now()) @map("created_at") @db.Timestamptz
+
+  events        ReferralEvent[]
+  contributions Contribution[]
+
+  @@map("referrals")
+}
+
+// docs/DATABASE.md §3.8
+model ReferralEvent {
+  id             BigInt            @id @default(autoincrement())
+  referralId     BigInt            @map("referral_id")
+  referral       Referral          @relation(fields: [referralId], references: [id])
+  eventType      ReferralEventType @map("event_type")
+  contributionId BigInt?           @map("contribution_id")
+  contribution   Contribution?     @relation(fields: [contributionId], references: [id])
+  ipHash         String?           @map("ip_hash")
+  createdAt      DateTime          @default(now()) @map("created_at") @db.Timestamptz
+
+  @@index([referralId, eventType])
+  @@map("referral_events")
 }
 
 // docs/DATABASE.md §3.1. amount_paise > 0 CHECK and the partial display_name index
 // are added by raw SQL in the migration — Prisma's schema DSL doesn't express either.
 model Contribution {
-  id                  BigInt             @id @default(autoincrement())
-  publicCode          String             @unique @map("public_code")
-  displayName         String             @map("display_name")
-  anonymous           Boolean            @default(false)
-  amountPaise         BigInt             @map("amount_paise")
-  currency            String             @default("INR")
-  status              ContributionStatus
-  contributorId       BigInt             @map("contributor_id")
-  contributor         Contributor        @relation(fields: [contributorId], references: [id])
-  referralCodeUsed    String?            @map("referral_code_used")
-  utrLast4            String?            @map("utr_last4") @db.Char(4)
-  idempotencyKey      String?            @unique @map("idempotency_key")
-  ipHash              String?            @map("ip_hash")
-  userAgentHash       String?            @map("user_agent_hash")
-  rejectionReason     String?            @map("rejection_reason")
-  expiresAt           DateTime?          @map("expires_at") @db.Timestamptz
-  createdAt           DateTime           @default(now()) @map("created_at") @db.Timestamptz
-  paymentSubmittedAt  DateTime?          @map("payment_submitted_at") @db.Timestamptz
-  paidAt              DateTime?          @map("paid_at") @db.Timestamptz
-  verifiedAt          DateTime?          @map("verified_at") @db.Timestamptz
-  publishedAt         DateTime?          @map("published_at") @db.Timestamptz
+  id                 BigInt             @id @default(autoincrement())
+  publicCode         String             @unique @map("public_code")
+  displayName        String             @map("display_name")
+  anonymous          Boolean            @default(false)
+  amountPaise        BigInt             @map("amount_paise")
+  currency           String             @default("INR")
+  status             ContributionStatus
+  contributorId      BigInt             @map("contributor_id")
+  contributor        Contributor        @relation(fields: [contributorId], references: [id])
+  referralCodeUsed   String?            @map("referral_code_used")
+  referralUsed       Referral?          @relation(fields: [referralCodeUsed], references: [code])
+  utrLast4           String?            @map("utr_last4") @db.Char(4)
+  idempotencyKey     String?            @unique @map("idempotency_key")
+  ipHash             String?            @map("ip_hash")
+  userAgentHash      String?            @map("user_agent_hash")
+  rejectionReason    String?            @map("rejection_reason")
+  expiresAt          DateTime?          @map("expires_at") @db.Timestamptz
+  createdAt          DateTime           @default(now()) @map("created_at") @db.Timestamptz
+  paymentSubmittedAt DateTime?          @map("payment_submitted_at") @db.Timestamptz
+  paidAt             DateTime?          @map("paid_at") @db.Timestamptz
+  verifiedAt         DateTime?          @map("verified_at") @db.Timestamptz
+  publishedAt        DateTime?          @map("published_at") @db.Timestamptz
+
+  payments        Payment[]
+  pixelAllocation PixelAllocation?
+  referralEvents  ReferralEvent[]
 
   @@index([status])
   @@index([contributorId])
   @@index([referralCodeUsed])
   @@index([createdAt])
   @@map("contributions")
+}
+
+// docs/DATABASE.md §3.3. One row per payment attempt; a contribution may have several,
+// but at most one may ever reach VERIFIED (enforced by the state machine, not a DB constraint).
+// The `UNIQUE(provider, provider_payment_id) WHERE provider_payment_id IS NOT NULL` index
+// is added by raw SQL in the migration — Prisma's schema DSL doesn't express partial uniqueness.
+model Payment {
+  id                 BigInt        @id @default(autoincrement())
+  contributionId     BigInt        @map("contribution_id")
+  contribution       Contribution  @relation(fields: [contributionId], references: [id])
+  provider           String
+  providerPaymentId  String?       @map("provider_payment_id")
+  amountPaise        BigInt        @map("amount_paise")
+  status             PaymentStatus
+  referenceHash      String?       @map("reference_hash")
+  utrLast4           String?       @map("utr_last4") @db.Char(4)
+  verificationMethod String?       @map("verification_method")
+  verifiedByAdminId  BigInt?       @map("verified_by_admin_id")
+  verifiedByAdmin    AdminUser?    @relation(fields: [verifiedByAdminId], references: [id])
+  rawProviderPayload Json?         @map("raw_provider_payload")
+  createdAt          DateTime      @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt          DateTime      @updatedAt @map("updated_at") @db.Timestamptz
+
+  @@index([contributionId])
+  @@index([referenceHash, amountPaise])
+  @@map("payments")
+}
+
+// docs/DATABASE.md §3.4. `pixel_count`/`pixel_range` are DB-generated columns and
+// the GiST exclusion constraint is added by raw SQL in the migration — Prisma's
+// schema DSL expresses neither generated columns of this form nor exclusion
+// constraints. `pixel_range` uses `Unsupported` since Prisma has no int8range
+// scalar; it's queried only via raw SQL per docs/PIXEL_SYSTEM.md §3.3-3.4.
+model PixelAllocation {
+  id             BigInt                   @id @default(autoincrement())
+  contributionId BigInt                   @unique @map("contribution_id")
+  contribution   Contribution             @relation(fields: [contributionId], references: [id])
+  startPixel     BigInt                   @map("start_pixel")
+  endPixel       BigInt                   @map("end_pixel")
+  pixelCount     BigInt                   @default(dbgenerated("(end_pixel - start_pixel)")) @map("pixel_count")
+  pixelRange     Unsupported("int8range") @default(dbgenerated("int8range(start_pixel, end_pixel, '[)'::text)")) @map("pixel_range")
+  createdAt      DateTime                 @default(now()) @map("created_at") @db.Timestamptz
+
+  @@map("pixel_allocations")
+}
+
+// docs/DATABASE.md §3.5. Single-row allocation watermark, advanced only via the
+// atomic UPDATE...RETURNING in docs/PIXEL_SYSTEM.md §2.2. The `CHECK (id = 1)`
+// singleton guard is added by raw SQL — Prisma's schema DSL has no CHECK constraint.
+model PixelCursor {
+  id        Int      @id @db.SmallInt
+  nextIndex BigInt   @default(0) @map("next_index")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+
+  @@map("pixel_cursor")
+}
+
+// docs/DATABASE.md §3.6. Single-row O(1) read cache for GET /api/progress, updated
+// transactionally alongside pixel allocation (docs/PIXEL_SYSTEM.md §2.3). The
+// `CHECK (id = 1)` singleton guard is added by raw SQL, as with `pixel_cursor`.
+model CampaignTotals {
+  id                       Int      @id @db.SmallInt
+  totalVerifiedAmountPaise BigInt   @default(0) @map("total_verified_amount_paise")
+  verifiedContributorCount BigInt   @default(0) @map("verified_contributor_count")
+  totalPixelsAllocated     BigInt   @default(0) @map("total_pixels_allocated")
+  updatedAt                DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+
+  @@map("campaign_totals")
 }

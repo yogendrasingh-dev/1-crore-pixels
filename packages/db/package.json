@@ -15,7 +15,7 @@
     "studio": "dotenv -e ../../.env -- prisma studio",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "lint": "eslint .",
-    "test": "vitest run"
+    "test": "dotenv -e ../../.env -- vitest run"
   },
   "dependencies": {
     "@prisma/client": "6.19.3"
