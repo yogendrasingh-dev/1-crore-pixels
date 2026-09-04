@@ -1,3 +1,10 @@
+import { MilestonesList } from "./MilestonesList";
+
 export default function ProgressPage() {
-  return <main>Progress / Journey — content lands in Phase 6/8 (docs/TASKS.md).</main>;
+  return (
+    <main>
+      <h1>Progress / Journey</h1>
+      <MilestonesList />
+    </main>
+  );
 }

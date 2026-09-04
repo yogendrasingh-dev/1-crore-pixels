@@ -246,8 +246,8 @@ All under `/api/admin/*`. All require an authenticated admin session; each actio
 | `POST /api/admin/contributions/{id}/reject` | Transition to `VERIFICATION_FAILED` with a reason. Role: `VERIFIER`+ |
 | `POST /api/admin/contributions/{id}/refund` | Transition to `REFUND_PENDING`/`REFUNDED` (policy per `docs/PAYMENT.md` §6, Open Decision). Role: `SUPER_ADMIN` |
 | `POST /api/admin/contributions/{id}/moderate-name` | Hide/replace an inappropriate display name (PRD §9.1, §16). Role: `CONTENT_EDITOR`+ |
-| `POST /api/admin/updates` / `PATCH /api/admin/updates/{id}` | Publish/edit updates (PRD §18). Role: `CONTENT_EDITOR`+ |
-| `POST /api/admin/milestones` / `PATCH /api/admin/milestones/{id}` | Manage milestones (PRD §17). Role: `CONTENT_EDITOR`+ |
+| `GET /api/admin/updates` / `POST /api/admin/updates` / `PATCH /api/admin/updates/{id}` | List (incl. `DRAFT`, for the admin UI's list/edit screen), publish, and edit updates (PRD §18). GET: any authenticated admin. POST/PATCH: role `CONTENT_EDITOR`+ |
+| `GET /api/admin/milestones` / `POST /api/admin/milestones` / `PATCH /api/admin/milestones/{id}` | List, create, and edit milestones (PRD §17). GET: any authenticated admin. POST/PATCH: role `CONTENT_EDITOR`+ |
 | `GET /api/admin/audit-logs` | Audit trail viewer. Role: `SUPER_ADMIN` |
 | `GET /api/admin/dashboard` | Totals, pending amount, verified contributor count, pixel count, recent contributions (PRD §22) |
 

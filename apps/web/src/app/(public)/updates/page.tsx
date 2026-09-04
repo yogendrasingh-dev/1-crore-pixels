@@ -1,3 +1,10 @@
+import { UpdatesList } from "./UpdatesList";
+
 export default function UpdatesPage() {
-  return <main>Updates — content lands in Phase 8 (docs/TASKS.md).</main>;
+  return (
+    <main>
+      <h1>Updates</h1>
+      <UpdatesList />
+    </main>
+  );
 }

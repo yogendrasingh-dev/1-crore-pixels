@@ -142,12 +142,12 @@ Goal: PRD §8.4, §8.6, §15, §16 are implemented. Depends on Phase 4.
 
 Goal: PRD §22's Content/Moderation admin capabilities exist. Depends on Phase 5.
 
-- [ ] **T8.1** `POST /api/admin/updates` / `PATCH /api/admin/updates/{id}` — publish/edit updates (PRD §18).
-- [ ] **T8.2** `POST /api/admin/milestones` / `PATCH /api/admin/milestones/{id}` — manage milestones (PRD §17).
-- [ ] **T8.3** `POST /api/admin/contributions/{id}/moderate-name` — hide/replace inappropriate display names (PRD §9.1, §16).
-- [ ] **T8.4** Admin UI screens for the above three (list/edit forms), RBAC-gated per role.
-- [ ] **T8.5** Public Updates page and Progress/Journey/Milestones page consuming `GET /api/updates` / `GET /api/milestones` (PRD §18, §8.5, §17).
-- [ ] **T8.6** `GET /api/admin/audit-logs` viewer, `SUPER_ADMIN`-only (PRD §22 Audit).
+- [x] **T8.1** `POST /api/admin/updates` / `PATCH /api/admin/updates/{id}` — publish/edit updates (PRD §18).
+- [x] **T8.2** `POST /api/admin/milestones` / `PATCH /api/admin/milestones/{id}` — manage milestones (PRD §17).
+- [x] **T8.3** `POST /api/admin/contributions/{id}/moderate-name` — hide/replace inappropriate display names (PRD §9.1, §16).
+- [x] **T8.4** Admin UI screens for the above three (list/edit forms), RBAC-gated per role.
+- [x] **T8.5** Public Updates page and Progress/Journey/Milestones page consuming `GET /api/updates` / `GET /api/milestones` (PRD §18, §8.5, §17).
+- [x] **T8.6** `GET /api/admin/audit-logs` viewer, `SUPER_ADMIN`-only (PRD §22 Audit).
 
 ---
 
