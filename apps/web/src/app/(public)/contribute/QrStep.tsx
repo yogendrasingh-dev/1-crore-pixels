@@ -45,7 +45,7 @@ export function QrStep({
         Open in UPI App
       </a>
       <p className="qr-expiry">Expires in {formatCountdown(msRemaining)}</p>
-      <button type="button" onClick={onPaid}>
+      <button type="button" className="cta-button cta-button-secondary" onClick={onPaid}>
         I&apos;ve Paid — Enter UTR
       </button>
     </div>

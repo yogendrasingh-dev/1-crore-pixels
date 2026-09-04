@@ -2,9 +2,13 @@
 
 import { formatRupees } from "@/lib/format";
 import { useProgress } from "./useProgress";
+import { useCountUp } from "./useCountUp";
 
 export function LiveProgressSection() {
   const { progress, error } = useProgress();
+  const raised = useCountUp(progress?.totalRaisedRupees ?? 0);
+  const contributors = useCountUp(progress?.verifiedContributorCount ?? 0);
+  const pixels = useCountUp(progress?.pixelsClaimed ?? 0);
 
   if (error && !progress) {
     return (
@@ -17,7 +21,9 @@ export function LiveProgressSection() {
   if (!progress) {
     return (
       <section className="progress-section">
-        <p>Loading progress…</p>
+        <div className="skeleton skeleton-line" style={{ width: "60%" }} />
+        <div className="skeleton skeleton-bar" />
+        <div className="skeleton skeleton-line" style={{ width: "40%" }} />
       </section>
     );
   }
@@ -26,9 +32,12 @@ export function LiveProgressSection() {
 
   return (
     <section className="progress-section">
-      <h2>Live Progress</h2>
+      <h2>
+        <span className="live-dot" aria-hidden="true" />
+        Live Progress
+      </h2>
       <p className="progress-amount">
-        {formatRupees(progress.totalRaisedRupees)} / {formatRupees(progress.goalRupees)}
+        {formatRupees(raised)} / {formatRupees(progress.goalRupees)}
       </p>
       <div className="progress-bar-track">
         <div className="progress-bar-fill" style={{ width: `${percent}%` }} />
@@ -36,11 +45,11 @@ export function LiveProgressSection() {
       <p>{progress.percentFunded}% funded</p>
       <div className="progress-stats">
         <div>
-          <strong>{progress.verifiedContributorCount}</strong>
+          <strong>{contributors}</strong>
           <span>verified contributors</span>
         </div>
         <div>
-          <strong>{progress.pixelsClaimed.toLocaleString("en-IN")}</strong>
+          <strong>{pixels.toLocaleString("en-IN")}</strong>
           <span>pixels claimed</span>
         </div>
       </div>

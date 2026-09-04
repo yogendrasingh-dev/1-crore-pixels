@@ -73,16 +73,16 @@ export function SuccessStep({ pixelRange, referralCode, displayName }: SuccessSt
         <Link href="/pixel-wall" className="cta-button">
           View My Pixels
         </Link>
-        <button type="button" onClick={handleShare}>
+        <button type="button" className="cta-button cta-button-secondary" onClick={handleShare}>
           Share My Contribution
         </button>
-        <button type="button" onClick={handleWhatsAppShare}>
+        <button type="button" className="cta-button cta-button-secondary" onClick={handleWhatsAppShare}>
           Share on WhatsApp
         </button>
-        <button type="button" onClick={handleXShare}>
+        <button type="button" className="cta-button cta-button-secondary" onClick={handleXShare}>
           Share on X
         </button>
-        <button type="button" onClick={handleCopyLink}>
+        <button type="button" className="cta-button cta-button-secondary" onClick={handleCopyLink}>
           {copied ? "Copied!" : "Copy Link"}
         </button>
       </div>

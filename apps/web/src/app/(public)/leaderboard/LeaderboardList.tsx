@@ -26,13 +26,25 @@ export function LeaderboardList() {
     })();
   }, []);
 
-  if (loading) return <p>Loading leaderboard…</p>;
+  if (loading) {
+    return (
+      <div className="skeleton-list">
+        {[0, 1, 2, 3].map((i) => (
+          <div key={i} className="skeleton skeleton-row" />
+        ))}
+      </div>
+    );
+  }
   if (items.length === 0) return <p>No referrals yet — be the first to invite a friend.</p>;
 
   return (
     <ol className="leaderboard-list">
-      {items.map((item) => (
-        <li key={`${item.rank}-${item.displayName}`} className="leaderboard-item">
+      {items.map((item, index) => (
+        <li
+          key={`${item.rank}-${item.displayName}`}
+          className="leaderboard-item list-item-in"
+          style={{ animationDelay: `${Math.min(index, 8) * 40}ms` }}
+        >
           <span className="leaderboard-rank">#{item.rank}</span>
           <span className="leaderboard-name">{item.displayName}</span>
           <span className="leaderboard-count">{item.referralCount} referrals</span>

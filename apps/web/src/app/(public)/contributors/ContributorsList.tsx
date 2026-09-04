@@ -51,18 +51,35 @@ export function ContributorsList() {
         onChange={(event) => setSearch(event.target.value)}
         aria-label="Search contributors by name"
       />
-      <ul className="contributors-list">
-        {items.map((item, index) => (
-          <li key={`${item.displayName}-${index}`} className="contributors-list-item">
-            <span className="contributors-name">{item.displayName}</span>
-            <span className="pixel-count">{item.pixelCount.toLocaleString("en-IN")} px</span>
-            <span className="contributors-ago">{item.contributedAgo}</span>
-          </li>
-        ))}
-      </ul>
+      {items.length === 0 && loading ? (
+        <div className="skeleton-list">
+          {[0, 1, 2, 3].map((i) => (
+            <div key={i} className="skeleton skeleton-row" />
+          ))}
+        </div>
+      ) : (
+        <ul className="contributors-list">
+          {items.map((item, index) => (
+            <li
+              key={`${item.displayName}-${index}`}
+              className="contributors-list-item list-item-in"
+              style={{ animationDelay: `${Math.min(index, 8) * 40}ms` }}
+            >
+              <span className="contributors-name">{item.displayName}</span>
+              <span className="pixel-count">{item.pixelCount.toLocaleString("en-IN")} px</span>
+              <span className="contributors-ago">{item.contributedAgo}</span>
+            </li>
+          ))}
+        </ul>
+      )}
       {items.length === 0 && !loading && <p>No contributors found.</p>}
       {nextCursor && (
-        <button type="button" disabled={loading} onClick={() => void load(search, nextCursor, true)}>
+        <button
+          type="button"
+          className="cta-button-secondary cta-button cta-button-small"
+          disabled={loading}
+          onClick={() => void load(search, nextCursor, true)}
+        >
           Load more
         </button>
       )}

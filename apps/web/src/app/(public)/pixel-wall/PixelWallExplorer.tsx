@@ -56,14 +56,17 @@ export function PixelWallExplorer({ initialFocusIndex }: PixelWallExplorerProps)
           onChange={(event) => setQuery(event.target.value)}
           aria-label="Search by contributor name or pixel ID"
         />
-        <button type="submit">Search</button>
+        <button type="submit" className="cta-button cta-button-small">
+          Search
+        </button>
       </form>
       {notFound && <p className="pixel-wall-search-empty">No match found.</p>}
       {nameMatches && nameMatches.length > 0 && (
         <ul className="pixel-wall-search-results">
           {nameMatches.map((match, index) => (
-            <li key={`${match.displayName}-${index}`}>
-              {match.anonymous ? "Anonymous" : match.displayName} — {match.pixelCount.toLocaleString("en-IN")} px
+            <li key={`${match.displayName}-${index}`} className="pixel-wall-search-result-item">
+              <span className="contributors-name">{match.anonymous ? "Anonymous" : match.displayName}</span>
+              <span className="pixel-count">{match.pixelCount.toLocaleString("en-IN")} px</span>
             </li>
           ))}
         </ul>

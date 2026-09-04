@@ -1,3 +1,10 @@
+import { StorySection } from "../_components/StorySection";
+
 export default function StoryPage() {
-  return <main>Our Story — content lands in Phase 6 (docs/TASKS.md).</main>;
+  return (
+    <main>
+      <h1>Our Story</h1>
+      <StorySection />
+    </main>
+  );
 }

@@ -1,3 +1,8 @@
 export default function CampaignInformationPage() {
-  return <main>Campaign Information — content lands post-legal-review (docs/PRD.md §27).</main>;
+  return (
+    <main>
+      <h1>Campaign Information</h1>
+      <p>Detailed campaign information is coming soon.</p>
+    </main>
+  );
 }

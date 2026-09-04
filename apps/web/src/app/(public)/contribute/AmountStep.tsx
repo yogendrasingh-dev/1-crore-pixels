@@ -72,7 +72,7 @@ export function AmountStep({
       ) : null}
       {(localError ?? error) ? <p className="field-error">{localError ?? error}</p> : null}
       <div className="flow-actions">
-        <button type="button" onClick={onBack} disabled={submitting}>
+        <button type="button" className="cta-button cta-button-secondary" onClick={onBack} disabled={submitting}>
           Back
         </button>
         <button type="submit" className="cta-button" disabled={submitting}>
