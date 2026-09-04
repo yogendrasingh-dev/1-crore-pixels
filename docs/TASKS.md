@@ -127,14 +127,14 @@ Goal: the visitor-facing flow from PRD §8–§9 works end-to-end against the Ph
 
 Goal: PRD §8.4, §8.6, §15, §16 are implemented. Depends on Phase 4.
 
-- [ ] **T7.1** Contributors list component consuming `GET /api/contributors`, rendering display name/Anonymous + pixel count (PRD §8.6, §16), never rendering any field outside `docs/API.md` §2.7's shape.
-- [ ] **T7.2** Canvas/WebGL pixel wall renderer: viewport-based chunk loading using `GET /api/pixels?chunk=` per `docs/PIXEL_SYSTEM.md` §3.2 — must not create one DOM node per pixel (PRD §15 hard requirement).
-- [ ] **T7.3** Zoom and pan interactions on the wall (PRD §15, §8.4).
-- [ ] **T7.4** Tap/click a pixel → show public contributor info via the already-loaded chunk data, falling back to `GET /api/pixels/{pixelId}` for deep links (`docs/PIXEL_SYSTEM.md` §3.4, §4).
-- [ ] **T7.5** Search by contributor name/pixel ID (PRD §15), using `GET /api/contributors?search=` and the pixel lookup endpoint respectively.
-- [ ] **T7.6** Deep-link support: a URL that opens the wall centered on a specific pixel/chunk.
-- [ ] **T7.7** Homepage pixel wall preview (a bounded viewport of the full wall) per PRD §8.4.
-- [ ] **T7.8** Performance validation: confirm smooth interaction with a densely-populated chunk (simulate many small allocations in one chunk) per `docs/TESTING.md` §5's dense-wall edge case.
+- [x] **T7.1** Contributors list component consuming `GET /api/contributors`, rendering display name/Anonymous + pixel count (PRD §8.6, §16), never rendering any field outside `docs/API.md` §2.7's shape.
+- [x] **T7.2** Canvas/WebGL pixel wall renderer: viewport-based chunk loading using `GET /api/pixels?chunk=` per `docs/PIXEL_SYSTEM.md` §3.2 — must not create one DOM node per pixel (PRD §15 hard requirement).
+- [x] **T7.3** Zoom and pan interactions on the wall (PRD §15, §8.4).
+- [x] **T7.4** Tap/click a pixel → show public contributor info via the already-loaded chunk data, falling back to `GET /api/pixels/{pixelId}` for deep links (`docs/PIXEL_SYSTEM.md` §3.4, §4).
+- [x] **T7.5** Search by contributor name/pixel ID (PRD §15), using `GET /api/contributors?search=` and the pixel lookup endpoint respectively.
+- [x] **T7.6** Deep-link support: a URL that opens the wall centered on a specific pixel/chunk.
+- [x] **T7.7** Homepage pixel wall preview (a bounded viewport of the full wall) per PRD §8.4.
+- [x] **T7.8** Performance validation: confirm smooth interaction with a densely-populated chunk (simulate many small allocations in one chunk) per `docs/TESTING.md` §5's dense-wall edge case.
 
 ---
 

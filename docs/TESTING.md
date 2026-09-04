@@ -82,7 +82,7 @@ Every row below must have at least one corresponding automated test:
 - [ ] Bot-created pending contributions (rate-limited)
 - [ ] Pixel allocation race condition (§4)
 - [ ] Concurrent payments (§4)
-- [ ] Extremely dense pixel wall / large chunk (chunk query stays performant with a large number of small allocations in one chunk)
+- [x] Extremely dense pixel wall / large chunk (chunk query stays performant with a large number of small allocations in one chunk) — `apps/web/src/app/api/pixels/route.test.ts`
 
 ---
 

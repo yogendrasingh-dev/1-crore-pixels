@@ -62,4 +62,34 @@ describe("GET /api/pixels?chunk= (docs/API.md §2.6)", () => {
     const response = await GET(new NextRequest("http://localhost/api/pixels"));
     expect(response.status).toBe(422);
   });
+
+  it("stays performant and correct for a chunk densely packed with many small allocations (docs/TESTING.md §5)", async () => {
+    const chunkId = "chunk_900";
+    const bounds = chunkBounds(chunkId);
+    const allocationCount = 500;
+
+    const fixtures = await Promise.all(
+      Array.from({ length: allocationCount }, () => createTestContribution({ status: "PUBLISHED", amountPaise: 1n })),
+    );
+    await prisma.pixelAllocation.createMany({
+      data: fixtures.map((f, i) => ({
+        contributionId: f.contribution.id,
+        startPixel: bounds.start + BigInt(i * 2),
+        endPixel: bounds.start + BigInt(i * 2) + 1n,
+      })),
+    });
+
+    try {
+      const start = performance.now();
+      const response = await GET(new NextRequest(`http://localhost/api/pixels?chunk=${chunkId}`));
+      const body = await response.json();
+      const elapsedMs = performance.now() - start;
+
+      expect(response.status).toBe(200);
+      expect(body.allocations).toHaveLength(allocationCount);
+      expect(elapsedMs).toBeLessThan(2000);
+    } finally {
+      await Promise.all(fixtures.map((f) => deleteTestContribution(f)));
+    }
+  });
 });

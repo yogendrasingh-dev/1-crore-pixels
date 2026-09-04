@@ -1,3 +1,10 @@
+import { ContributorsList } from "./ContributorsList";
+
 export default function ContributorsPage() {
-  return <main>Contributors — content lands in Phase 7 (docs/TASKS.md).</main>;
+  return (
+    <main>
+      <h1>Contributors</h1>
+      <ContributorsList />
+    </main>
+  );
 }
