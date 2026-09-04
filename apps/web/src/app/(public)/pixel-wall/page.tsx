@@ -1,3 +1,4 @@
+import { prisma } from "@1crore-pixels/db";
 import { PIXELS_PER_CHUNK } from "../_components/pixel-wall/geometry";
 import { PixelWallExplorer } from "./PixelWallExplorer";
 
@@ -16,10 +17,18 @@ export default async function PixelWallPage({ searchParams }: PixelWallPageProps
     if (match?.[1]) focusIndex = Number(match[1]) * PIXELS_PER_CHUNK;
   }
 
+  // Absent a deep link, center on the claimed/unclaimed frontier instead of row 0 — otherwise
+  // the initial viewport is either entirely claimed or entirely empty depending on progress.
+  let centerIndex: number | null = null;
+  if (focusIndex == null) {
+    const totals = await prisma.campaignTotals.findUniqueOrThrow({ where: { id: 1 } });
+    centerIndex = Number(totals.totalPixelsAllocated);
+  }
+
   return (
-    <main>
+    <main className="wide-page">
       <h1>Pixel Wall</h1>
-      <PixelWallExplorer initialFocusIndex={focusIndex} />
+      <PixelWallExplorer initialFocusIndex={focusIndex} initialCenterIndex={centerIndex} />
     </main>
   );
 }

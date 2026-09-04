@@ -11,9 +11,11 @@ interface ContributorMatch {
 
 export interface PixelWallExplorerProps {
   initialFocusIndex: number | null;
+  /** Where to center the viewport when there's no deep-linked focus (the claimed/unclaimed frontier). */
+  initialCenterIndex?: number | null;
 }
 
-export function PixelWallExplorer({ initialFocusIndex }: PixelWallExplorerProps) {
+export function PixelWallExplorer({ initialFocusIndex, initialCenterIndex }: PixelWallExplorerProps) {
   const [query, setQuery] = useState("");
   const [nameMatches, setNameMatches] = useState<ContributorMatch[] | null>(null);
   const [focusIndex, setFocusIndex] = useState<number | null>(initialFocusIndex);
@@ -71,7 +73,12 @@ export function PixelWallExplorer({ initialFocusIndex }: PixelWallExplorerProps)
           ))}
         </ul>
       )}
-      <PixelWallCanvas height={560} focusIndex={focusIndex} />
+      <PixelWallCanvas
+        height={560}
+        focusIndex={focusIndex}
+        centerIndex={initialCenterIndex}
+        initialCellSize={12}
+      />
     </div>
   );
 }

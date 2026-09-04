@@ -4,9 +4,9 @@ import { useCallback, useRef, useState } from "react";
 import { CHUNK_ROWS, WALL_WIDTH } from "./geometry";
 import type { ChunkData, ChunkResponse, PixelAllocationSpan } from "./types";
 
-const UNCLAIMED_COLOR = "#e8e3f5";
-const CLAIMED_COLOR = "#6d4fc4";
-const CLAIMED_ANONYMOUS_COLOR = "#a894e0";
+const UNCLAIMED_COLOR = "#f4f2fb";
+const CLAIMED_COLOR = "#4c1d95";
+const CLAIMED_ANONYMOUS_COLOR = "#7c3aed";
 
 function renderChunkBitmap(allocations: PixelAllocationSpan[], pixelStart: number): HTMLCanvasElement {
   const canvas = document.createElement("canvas");

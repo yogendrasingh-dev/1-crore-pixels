@@ -15,19 +15,32 @@ export interface PixelWallCanvasProps {
   height: number;
   /** Global pixel index to center the viewport on and highlight, per a deep link (PRD §15). */
   focusIndex?: number | null;
+  /**
+   * Global pixel index to center the viewport on without highlighting it — used to default the
+   * initial view to the claimed/unclaimed frontier instead of row 0, which otherwise shows a
+   * viewport that's either all-claimed or all-unclaimed depending on progress. Ignored if
+   * `focusIndex` is set.
+   */
+  centerIndex?: number | null;
+  /** Starting zoom level. Higher values keep individual pixels visibly square instead of fit-to-width blur. */
+  initialCellSize?: number;
+  /** Ambient auto-scroll for display-only previews; stops permanently on first user interaction. */
+  autoPan?: boolean;
 }
 
-export function PixelWallCanvas({ height, focusIndex }: PixelWallCanvasProps) {
+export function PixelWallCanvas({ height, focusIndex, centerIndex, initialCellSize, autoPan = false }: PixelWallCanvasProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const { chunks, ensureChunks } = usePixelChunks();
 
   const [size, setSize] = useState({ width: 0, height });
-  const [cellSize, setCellSize] = useState(0.2);
+  const [cellSize, setCellSize] = useState(initialCellSize ?? 0.2);
   const [pan, setPan] = useState({ x: 0, y: 0 }); // world (wall-pixel) coordinates of the top-left corner.
   const [selected, setSelected] = useState<SelectedPixel | null>(null);
+  const [hovered, setHovered] = useState<{ col: number; row: number } | null>(null);
   const dragRef = useRef<{ startX: number; startY: number; panX: number; panY: number; moved: boolean } | null>(null);
   const hasJumpedToFocusRef = useRef(false);
+  const autoPanRef = useRef(autoPan);
 
   const minCellSize = size.width > 0 ? size.width / WALL_WIDTH : MIN_CELL_SIZE_FLOOR;
 
@@ -41,13 +54,15 @@ export function PixelWallCanvas({ height, focusIndex }: PixelWallCanvasProps) {
   );
 
   // Resolves and highlights a deep-linked pixel directly (docs/PIXEL_SYSTEM.md §4), once, the
-  // first time the viewport has a real size to center on.
+  // first time the viewport has a real size to center on. `highlight: false` centers the pan
+  // without fetching/marking a selection — used for the default claimed/unclaimed frontier view.
   const jumpToFocus = useCallback(
-    (index: number, viewportHeight: number, cell: number, width: number) => {
+    (index: number, viewportHeight: number, cell: number, width: number, highlight: boolean) => {
       const row = Math.floor(index / WALL_WIDTH);
       const visibleRows = viewportHeight / cell;
       setPan((current) => clampPan({ x: current.x, y: row - visibleRows / 2 }, cell, width));
 
+      if (!highlight) return;
       fetch(`/api/pixels/${index}`)
         .then((response) => (response.ok ? (response.json() as Promise<PixelLookupResult>) : null))
         .then((data) => {
@@ -73,15 +88,36 @@ export function PixelWallCanvas({ height, focusIndex }: PixelWallCanvasProps) {
       const nextCellSize = Math.max(cellSize, width > 0 ? width / WALL_WIDTH : MIN_CELL_SIZE_FLOOR);
       setSize({ width, height });
       setCellSize(nextCellSize);
-      if (!hasJumpedToFocusRef.current && focusIndex != null && width > 0 && height > 0) {
-        hasJumpedToFocusRef.current = true;
-        jumpToFocus(focusIndex, height, nextCellSize, width);
+      if (!hasJumpedToFocusRef.current && width > 0 && height > 0) {
+        if (focusIndex != null) {
+          hasJumpedToFocusRef.current = true;
+          jumpToFocus(focusIndex, height, nextCellSize, width, true);
+        } else if (centerIndex != null) {
+          hasJumpedToFocusRef.current = true;
+          jumpToFocus(centerIndex, height, nextCellSize, width, false);
+        }
       }
     });
     observer.observe(container);
     return () => observer.disconnect();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [height]);
+
+  // Ambient drift for display-only previews, giving the wall a sense of life without user input.
+  useEffect(() => {
+    if (!autoPan || size.width === 0) return;
+    let frame: number;
+    const step = () => {
+      if (autoPanRef.current) {
+        const visibleCols = size.width / cellSize;
+        const maxX = Math.max(0, WALL_WIDTH - visibleCols);
+        setPan((current) => ({ x: current.x + 0.03 > maxX ? 0 : current.x + 0.03, y: current.y }));
+      }
+      frame = requestAnimationFrame(step);
+    };
+    frame = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(frame);
+  }, [autoPan, cellSize, size.width]);
 
   // Ensure the visible chunk range (plus a small prefetch margin) is loaded.
   useEffect(() => {
@@ -119,6 +155,44 @@ export function PixelWallCanvas({ height, focusIndex }: PixelWallCanvasProps) {
       ctx.drawImage(chunk.canvas, 0, 0, WALL_WIDTH, CHUNK_ROWS, dx, dy, WALL_WIDTH * cellSize, CHUNK_ROWS * cellSize);
     }
 
+    // Grid lines only render once cells are big enough to read as separate squares —
+    // below this they'd just add visual noise on top of a near-solid fill. "difference"
+    // blending keeps the line visible on both the light unclaimed fill and the dark
+    // claimed fill, instead of a fixed dark tint that vanishes on dark pixels.
+    if (cellSize >= 6) {
+      ctx.save();
+      ctx.globalCompositeOperation = "difference";
+      ctx.strokeStyle = "rgba(140, 140, 140, 0.6)";
+      ctx.lineWidth = 1;
+      const firstCol = Math.floor(pan.x);
+      const lastCol = Math.ceil(pan.x + size.width / cellSize);
+      for (let col = firstCol; col <= lastCol; col += 1) {
+        const x = Math.round((col - pan.x) * cellSize) + 0.5;
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, size.height);
+        ctx.stroke();
+      }
+      const firstRow = Math.floor(pan.y);
+      const lastRow = Math.ceil(pan.y + visibleRows);
+      for (let row = firstRow; row <= lastRow; row += 1) {
+        const y = Math.round((row - pan.y) * cellSize) + 0.5;
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(size.width, y);
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+
+    if (hovered && !selected) {
+      ctx.fillStyle = "rgba(109, 40, 217, 0.25)";
+      ctx.fillRect((hovered.col - pan.x) * cellSize, (hovered.row - pan.y) * cellSize, cellSize, cellSize);
+      ctx.strokeStyle = "#6d28d9";
+      ctx.lineWidth = 1.5;
+      ctx.strokeRect((hovered.col - pan.x) * cellSize, (hovered.row - pan.y) * cellSize, cellSize, cellSize);
+    }
+
     if (selected) {
       const row = Math.floor(selected.index / WALL_WIDTH);
       const col = selected.index % WALL_WIDTH;
@@ -132,7 +206,7 @@ export function PixelWallCanvas({ height, focusIndex }: PixelWallCanvasProps) {
         markerSize * 2,
       );
     }
-  }, [chunks, pan, cellSize, size, selected]);
+  }, [chunks, pan, cellSize, size, selected, hovered]);
 
   function resolveSelection(index: number) {
     if (index < 0 || index >= WALL_WIDTH * MAX_ROW) return;
@@ -164,18 +238,37 @@ export function PixelWallCanvas({ height, focusIndex }: PixelWallCanvasProps) {
   }
 
   function handlePointerDown(event: PointerEvent<HTMLCanvasElement>) {
+    autoPanRef.current = false;
     (event.target as HTMLElement).setPointerCapture(event.pointerId);
     dragRef.current = { startX: event.clientX, startY: event.clientY, panX: pan.x, panY: pan.y, moved: false };
   }
 
   function handlePointerMove(event: PointerEvent<HTMLCanvasElement>) {
     const drag = dragRef.current;
-    if (!drag) return;
+    if (!drag) {
+      if (cellSize < 6) {
+        if (hovered) setHovered(null);
+        return;
+      }
+      const rect = event.currentTarget.getBoundingClientRect();
+      const col = Math.floor(pan.x + (event.clientX - rect.left) / cellSize);
+      const row = Math.floor(pan.y + (event.clientY - rect.top) / cellSize);
+      if (col < 0 || col >= WALL_WIDTH || row < 0) {
+        if (hovered) setHovered(null);
+        return;
+      }
+      if (!hovered || hovered.col !== col || hovered.row !== row) setHovered({ col, row });
+      return;
+    }
     const dx = event.clientX - drag.startX;
     const dy = event.clientY - drag.startY;
     if (Math.abs(dx) > DRAG_THRESHOLD_PX || Math.abs(dy) > DRAG_THRESHOLD_PX) drag.moved = true;
     if (!drag.moved) return;
     setPan(clampPan({ x: drag.panX - dx / cellSize, y: drag.panY - dy / cellSize }, cellSize, size.width));
+  }
+
+  function handlePointerLeave() {
+    if (hovered) setHovered(null);
   }
 
   function handlePointerUp(event: PointerEvent<HTMLCanvasElement>) {
@@ -192,6 +285,7 @@ export function PixelWallCanvas({ height, focusIndex }: PixelWallCanvasProps) {
 
   function handleWheel(event: WheelEvent<HTMLCanvasElement>) {
     event.preventDefault();
+    autoPanRef.current = false;
     if (event.ctrlKey || event.metaKey) {
       const factor = event.deltaY < 0 ? 1.15 : 1 / 1.15;
       setCellSize((current) => Math.min(MAX_CELL_SIZE, Math.max(minCellSize, current * factor)));
@@ -214,6 +308,7 @@ export function PixelWallCanvas({ height, focusIndex }: PixelWallCanvasProps) {
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
+        onPointerLeave={handlePointerLeave}
         onWheel={handleWheel}
       />
       <div className="pixel-wall-controls">
