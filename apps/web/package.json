@@ -1,0 +1,34 @@
+{
+  "name": "@1crore-pixels/web",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@1crore-pixels/core": "workspace:*",
+    "@1crore-pixels/db": "workspace:*",
+    "@1crore-pixels/payment-providers": "workspace:*",
+    "@1crore-pixels/ui": "workspace:*",
+    "next": "16.3.4",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "zod": "4.5.4"
+  },
+  "devDependencies": {
+    "@1crore-pixels/config": "workspace:*",
+    "@types/node": "26.4.1",
+    "@types/react": "19.2.18",
+    "@types/react-dom": "19.2.7",
+    "eslint": "9.39.5",
+    "eslint-config-next": "16.3.4",
+    "typescript": "6.0.3",
+    "vitest": "5.0.0"
+  }
+}

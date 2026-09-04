@@ -1,0 +1,9 @@
+// Schema — docs/DATABASE.md. Models are added table-by-table in Phase 1 (docs/TASKS.md T1.1-T1.10).
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}

@@ -1,0 +1,28 @@
+node_modules/
+.pnpm-store/
+
+# env
+.env
+.env.local
+.env.*.local
+
+# next.js
+.next/
+out/
+
+# build
+dist/
+build/
+*.tsbuildinfo
+
+# testing
+coverage/
+
+# logs
+*.log
+
+# prisma
+packages/db/generated/
+
+# misc
+.DS_Store

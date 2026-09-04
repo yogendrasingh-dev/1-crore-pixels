@@ -1,0 +1,10 @@
+packages:
+  - "apps/*"
+  - "packages/*"
+allowBuilds:
+  "@prisma/client": true
+  "@prisma/engines": true
+  prisma: true
+  unrs-resolver: true
+minimumReleaseAgeExclude:
+  - "@eslint/plugin-kit@0.7.3"

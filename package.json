@@ -1,0 +1,29 @@
+{
+  "name": "1-crore-pixels",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22",
+    "pnpm": ">=11"
+  },
+  "packageManager": "pnpm@11.25.0+sha512.5cde925b4f075f725eb71fbae18a42ffe784524789f19b61c731cb8721ec28aaee160e01a8d5af4fedb2a42cdbf300efe23db356b0d4a17b4d63e11f8ab7c956",
+  "prettier": "@1crore-pixels/config/prettier",
+  "scripts": {
+    "dev": "pnpm --filter @1crore-pixels/web dev",
+    "build": "pnpm --filter @1crore-pixels/web build",
+    "typecheck": "pnpm -r run typecheck",
+    "lint": "pnpm -r run lint",
+    "lint:fix": "pnpm -r run lint -- --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "pnpm -r --if-present run test",
+    "db:generate": "pnpm --filter @1crore-pixels/db run generate",
+    "db:migrate": "pnpm --filter @1crore-pixels/db run migrate",
+    "postinstall": "pnpm run db:generate"
+  },
+  "devDependencies": {
+    "@1crore-pixels/config": "workspace:*",
+    "prettier": "3.9.6"
+  }
+}
