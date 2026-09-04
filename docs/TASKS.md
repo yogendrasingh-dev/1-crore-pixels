@@ -45,15 +45,15 @@ Goal: the full schema from `docs/DATABASE.md` exists, migrated, and typed — no
 
 Goal: state machine, allocation engine, and validation exist as pure, tested logic, independent of any HTTP layer. Depends on Phase 1.
 
-- [ ] **T2.1** Implement the contribution state machine transition functions per the transition table in `docs/PAYMENT.md` §2.1, each performing its documented conditional DB update.
-- [ ] **T2.2** Unit test every transition and every guard-rejection case (`docs/TESTING.md` §2.1).
-- [ ] **T2.3** Implement the pixel allocation transaction exactly as specified in `docs/PIXEL_SYSTEM.md` §2.3 (single DB transaction: conditional PAID transition → cursor reservation → allocation insert → totals update → publish).
-- [ ] **T2.4** Implement the global index ↔ `(row, col)` ↔ `chunkId` mapping functions per `docs/PIXEL_SYSTEM.md` §3.1–3.2, as pure functions.
-- [ ] **T2.5** Unit test the mapping functions across representative indices (wall start, chunk boundary, row boundary) (`docs/TESTING.md` §2.2).
-- [ ] **T2.6** Write the concurrency test suite from `docs/TESTING.md` §4 (duplicate verify race, concurrent contributions, cursor correctness) against the Phase 2 implementation.
-- [ ] **T2.7** Implement display-name validation + sanitization + moderation-flagging logic per `docs/SECURITY.md` §2 and PRD §9.1.
-- [ ] **T2.8** Implement amount validation per `docs/SECURITY.md` §2 (bounds pending Open Decision resolution — use a configurable min/max, not a hardcoded one, so the eventual decision doesn't require code changes).
-- [ ] **T2.9** Unit test validation logic (`docs/TESTING.md` §2.3).
+- [x] **T2.1** Implement the contribution state machine transition functions per the transition table in `docs/PAYMENT.md` §2.1, each performing its documented conditional DB update.
+- [x] **T2.2** Unit test every transition and every guard-rejection case (`docs/TESTING.md` §2.1).
+- [x] **T2.3** Implement the pixel allocation transaction exactly as specified in `docs/PIXEL_SYSTEM.md` §2.3 (single DB transaction: conditional PAID transition → cursor reservation → allocation insert → totals update → publish).
+- [x] **T2.4** Implement the global index ↔ `(row, col)` ↔ `chunkId` mapping functions per `docs/PIXEL_SYSTEM.md` §3.1–3.2, as pure functions.
+- [x] **T2.5** Unit test the mapping functions across representative indices (wall start, chunk boundary, row boundary) (`docs/TESTING.md` §2.2).
+- [x] **T2.6** Write the concurrency test suite from `docs/TESTING.md` §4 (duplicate verify race, concurrent contributions, cursor correctness) against the Phase 2 implementation.
+- [x] **T2.7** Implement display-name validation + sanitization + moderation-flagging logic per `docs/SECURITY.md` §2 and PRD §9.1.
+- [x] **T2.8** Implement amount validation per `docs/SECURITY.md` §2 (bounds pending Open Decision resolution — use a configurable min/max, not a hardcoded one, so the eventual decision doesn't require code changes).
+- [x] **T2.9** Unit test validation logic (`docs/TESTING.md` §2.3).
 
 ---
 

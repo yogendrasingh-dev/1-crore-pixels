@@ -97,6 +97,8 @@ Per PRD §33 (pnpm monorepo, Next.js, PostgreSQL). A single Next.js app hosts th
 
 **Rule:** `apps/web` route handlers are thin — they parse/validate the request, call into `packages/core` and `packages/db`, and shape the response. No business logic (state transitions, allocation math, verification matching) lives in a route handler.
 
+**`packages/core` depends on `packages/db`** (the Prisma client and its generated types), since the state machine transitions and the pixel allocation transaction *are* conditional DB updates (`docs/PAYMENT.md` §2.1, `docs/PIXEL_SYSTEM.md` §2.3) — "framework-agnostic" above means independent of Next.js/HTTP, not independent of persistence. `apps/web` never talks to Prisma directly for anything on the money/pixel path; it only calls the `packages/core` functions.
+
 ---
 
 ## 4. Why Next.js Server APIs (not a separate NestJS service) for MVP

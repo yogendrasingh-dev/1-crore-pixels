@@ -11,14 +11,16 @@
   "scripts": {
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "lint": "eslint .",
-    "test": "vitest run"
+    "test": "dotenv -e ../../.env -- vitest run"
   },
   "dependencies": {
+    "@1crore-pixels/db": "workspace:*",
     "zod": "4.5.4"
   },
   "devDependencies": {
     "@1crore-pixels/config": "workspace:*",
     "@types/node": "26.4.1",
+    "dotenv-cli": "11.0.0",
     "eslint": "9.39.5",
     "typescript": "6.0.3",
     "vitest": "5.0.0"
