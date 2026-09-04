@@ -12,10 +12,13 @@ if (process.env.NODE_ENV !== "production") {
 }
 
 export { Prisma, PrismaClient } from "@prisma/client";
+export { ContributionStatus } from "@prisma/client";
 export type {
+  AdminRole,
+  AdminUser,
+  AuditLog,
   CampaignTotals,
   Contribution,
-  ContributionStatus,
   Contributor,
   Milestone,
   Payment,

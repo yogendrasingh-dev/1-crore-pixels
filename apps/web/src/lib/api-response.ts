@@ -14,6 +14,8 @@ export const apiErrors = {
   invalidState: (message: string) => apiError(409, "INVALID_STATE", message),
   validation: (message: string) => apiError(422, "VALIDATION_ERROR", message),
   rateLimited: (message = "Too many requests") => apiError(429, "RATE_LIMITED", message),
+  unauthorized: (message = "Authentication required") => apiError(401, "UNAUTHORIZED", message),
+  forbidden: (message = "Insufficient permissions") => apiError(403, "FORBIDDEN", message),
 };
 
 /** Rupees are integer or 2-decimal-place decimal-safe at the API boundary (docs/API.md intro). */

@@ -34,4 +34,5 @@ export const RATE_LIMITS = {
   createContribution: { bucket: "create-contribution", limit: 10, windowSeconds: 60 },
   submitUtr: { bucket: "submit-utr", limit: 20, windowSeconds: 60 },
   referralVisit: { bucket: "referral-visit", limit: 30, windowSeconds: 60 },
+  adminLogin: { bucket: "admin-login", limit: 10, windowSeconds: 60 },
 } as const satisfies Record<string, RateLimitConfig>;

@@ -7,10 +7,17 @@
 // state-machine/index.ts) — folding it in here is what prevents a second way to reach
 // PIXELS_ASSIGNED.
 import { Prisma, prisma, type Contribution, type PixelAllocation, type PrismaClient } from "@1crore-pixels/db";
+import { writeAuditLog } from "../admin/audit";
 
 export interface PixelAllocationResult {
   contribution: Contribution;
   pixelAllocation: PixelAllocation;
+}
+
+/** Admin actor recorded in `audit_logs` when verification is triggered from the admin queue. */
+export interface AdminActionContext {
+  adminUserId: bigint;
+  ipAddress?: string;
 }
 
 function isRecordNotFound(error: unknown): boolean {
@@ -26,6 +33,7 @@ function isRecordNotFound(error: unknown): boolean {
 export async function verifyAndAllocatePixels(
   contributionId: bigint,
   db: PrismaClient = prisma,
+  admin?: AdminActionContext,
 ): Promise<PixelAllocationResult | null> {
   return db.$transaction(async (tx) => {
     let paid: Contribution;
@@ -79,6 +87,17 @@ export async function verifyAndAllocatePixels(
       where: { id: contributionId },
       data: { status: "PUBLISHED", publishedAt: new Date() },
     });
+
+    if (admin) {
+      await writeAuditLog(tx, {
+        adminUserId: admin.adminUserId,
+        action: "VERIFY_CONTRIBUTION",
+        entityType: "contribution",
+        entityId: String(contributionId),
+        afterState: { status: published.status, pixelCount: pixelCount.toString() },
+        ipAddress: admin.ipAddress,
+      });
+    }
 
     return { contribution: published, pixelAllocation };
   });

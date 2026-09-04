@@ -1,8 +1,36 @@
 // Shared DB fixtures for packages/core's integration/concurrency tests. Not part of the
 // package's public API (not re-exported from src/index.ts).
-import { prisma, type Contribution, type ContributionStatus, type Contributor } from "@1crore-pixels/db";
+import { prisma, type AdminRole, type AdminUser, type Contribution, type ContributionStatus, type Contributor } from "@1crore-pixels/db";
+import { hashPassword } from "../admin/auth";
 
 let counter = 0;
+
+export interface TestAdminOverrides {
+  role: AdminRole;
+  status?: string;
+  mfaEnabled?: boolean;
+  mfaSecretEncrypted?: string;
+}
+
+export async function createTestAdmin(overrides: TestAdminOverrides): Promise<AdminUser> {
+  counter += 1;
+  const passwordHash = await hashPassword("Sup3r-Secret-Password!");
+  return prisma.adminUser.create({
+    data: {
+      email: `admin_${Date.now()}_${counter}_${Math.random().toString(36).slice(2)}@test.local`,
+      passwordHash,
+      role: overrides.role,
+      status: overrides.status ?? "ACTIVE",
+      mfaEnabled: overrides.mfaEnabled ?? false,
+      mfaSecretEncrypted: overrides.mfaSecretEncrypted,
+    },
+  });
+}
+
+export async function deleteTestAdmin(admin: AdminUser): Promise<void> {
+  await prisma.auditLog.deleteMany({ where: { adminUserId: admin.id } });
+  await prisma.adminUser.delete({ where: { id: admin.id } });
+}
 
 export interface TestContributionOverrides {
   status: ContributionStatus;

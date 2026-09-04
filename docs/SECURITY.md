@@ -53,7 +53,7 @@ PRD §25: "Admin RBAC," "Admin MFA-ready architecture." PRD §22.
 - Admin accounts (`admin_users`, `docs/DATABASE.md` §3.12) use password hashing (e.g. bcrypt/argon2) — never plaintext, never reversible encryption.
 - **RBAC**: every admin endpoint declares the minimum role required (`docs/API.md` §4); role checks happen server-side on every request, not just hidden in the admin UI.
 - **MFA-ready**: schema carries `mfa_enabled`/`mfa_secret_encrypted` from day one so TOTP-based MFA can be turned on without a schema migration, even if not enforced for the very first admin users.
-- Admin sessions use secure, `HttpOnly`, `SameSite` cookies; session tokens are rotated on login and invalidated on logout.
+- Admin sessions use secure, `HttpOnly`, `SameSite` cookies; session tokens are rotated on login and invalidated on logout. Implementation: the session cookie is an opaque random token keyed in Redis (not a self-verifying JWT), so logout deletes the Redis entry outright rather than merely expiring a client-held credential; a separate non-`HttpOnly` CSRF cookie carries a matching token that state-changing admin requests must echo back in an `X-CSRF-Token` header (§7).
 - Admin login is rate-limited and lockout-protected (§3).
 
 ---

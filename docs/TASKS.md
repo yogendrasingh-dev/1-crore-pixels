@@ -92,17 +92,17 @@ Goal: all public endpoints from `docs/API.md` §2 exist, tested, and response-al
 
 Goal: admin login, RBAC, and the verification queue exist. Depends on Phase 2 (state machine) and Phase 1 (`admin_users`).
 
-- [ ] **T5.1** Implement admin password hashing + login/logout (`POST /api/admin/auth/login`, `/logout`) per `docs/SECURITY.md` §5.
-- [ ] **T5.2** Implement MFA-ready fields/flow scaffolding (TOTP secret storage encrypted-at-rest; enforcement toggle) — MFA can be enabled without a later migration (`docs/DATABASE.md` §3.12, `docs/SECURITY.md` §5).
-- [ ] **T5.3** Implement RBAC middleware checking `admin_role` against each endpoint's declared minimum role (`docs/API.md` §4).
-- [ ] **T5.4** Implement `audit_logs` writer helper that any admin action calls within its own transaction (`docs/SECURITY.md` §6).
-- [ ] **T5.5** `GET /api/admin/contributions` — verification queue with filters (`docs/API.md` §4, `docs/PRD.md` §22).
-- [ ] **T5.6** `GET /api/admin/contributions/{id}` — full detail view including payment evidence.
-- [ ] **T5.7** `POST /api/admin/contributions/{id}/verify` — invokes the Phase 2 allocation transaction; role `VERIFIER`+.
-- [ ] **T5.8** `POST /api/admin/contributions/{id}/reject` — transitions to `VERIFICATION_FAILED` with reason; role `VERIFIER`+.
-- [ ] **T5.9** Implement ambiguous-match surfacing in the queue (same amount + same UTR-last-4 across multiple pending contributions) per `docs/PAYMENT.md` §3.1.
-- [ ] **T5.10** `GET /api/admin/dashboard` — totals/pending/queue summary (PRD §22).
-- [ ] **T5.11** Security tests: unauthenticated/under-privileged access rejected on every admin route (`docs/TESTING.md` §7).
+- [x] **T5.1** Implement admin password hashing + login/logout (`POST /api/admin/auth/login`, `/logout`) per `docs/SECURITY.md` §5.
+- [x] **T5.2** Implement MFA-ready fields/flow scaffolding (TOTP secret storage encrypted-at-rest; enforcement toggle) — MFA can be enabled without a later migration (`docs/DATABASE.md` §3.12, `docs/SECURITY.md` §5).
+- [x] **T5.3** Implement RBAC middleware checking `admin_role` against each endpoint's declared minimum role (`docs/API.md` §4).
+- [x] **T5.4** Implement `audit_logs` writer helper that any admin action calls within its own transaction (`docs/SECURITY.md` §6).
+- [x] **T5.5** `GET /api/admin/contributions` — verification queue with filters (`docs/API.md` §4, `docs/PRD.md` §22).
+- [x] **T5.6** `GET /api/admin/contributions/{id}` — full detail view including payment evidence.
+- [x] **T5.7** `POST /api/admin/contributions/{id}/verify` — invokes the Phase 2 allocation transaction; role `VERIFIER`+.
+- [x] **T5.8** `POST /api/admin/contributions/{id}/reject` — transitions to `VERIFICATION_FAILED` with reason; role `VERIFIER`+.
+- [x] **T5.9** Implement ambiguous-match surfacing in the queue (same amount + same UTR-last-4 across multiple pending contributions) per `docs/PAYMENT.md` §3.1.
+- [x] **T5.10** `GET /api/admin/dashboard` — totals/pending/queue summary (PRD §22).
+- [x] **T5.11** Security tests: unauthenticated/under-privileged access rejected on every admin route (`docs/TESTING.md` §7).
 
 ---
 
