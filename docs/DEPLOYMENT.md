@@ -58,6 +58,7 @@ Per PRD §29 ("CDN/cache-friendly public pages") and `docs/ARCHITECTURE.md` §6:
 | `/` (home), `/story`, `/faq`, `/campaign-information` | Static/ISR with periodic revalidation — content changes only via admin updates, not per-request |
 | `GET /api/progress` | Short TTL (`s-maxage=10`, `stale-while-revalidate`) — correct within seconds, but shields the DB from per-visitor load during a spike |
 | `GET /api/pixels?chunk=` | Cacheable with a short TTL; invalidated implicitly by TTL expiry rather than active invalidation (a few seconds of staleness on a just-claimed pixel is acceptable and consistent with PRD's non-real-time framing) |
+| `GET /api/leaderboard` | Short TTL (`s-maxage=30, stale-while-revalidate=60`) — same rationale as `GET /api/progress`; referral rank a few seconds stale is acceptable (PRD §21) |
 | `GET /api/contributions/{id}` | Not cached — this is the individual user's own status polling and must reflect current server state |
 | `/api/admin/*` | Never cached |
 

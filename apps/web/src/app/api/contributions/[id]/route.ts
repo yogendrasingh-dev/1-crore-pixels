@@ -12,7 +12,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
   const { id } = await params;
   const contribution = await prisma.contribution.findUnique({
     where: { publicCode: id },
-    include: { pixelAllocation: true },
+    include: { pixelAllocation: true, contributor: { select: { referralCode: true } } },
   });
   if (!contribution) return apiErrors.notFound("Contribution not found");
 
@@ -23,6 +23,12 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
     anonymous: contribution.anonymous,
     amountRupees: paiseToRupees(contribution.amountPaise),
   };
+
+  // Own referral link for the "Share My Contribution" screen (PRD §19/§20, T9.3) — omitted
+  // for older/test-fixture contributors created before referral codes existed.
+  if (contribution.contributor.referralCode) {
+    body.referralCode = contribution.contributor.referralCode;
+  }
 
   if (contribution.pixelAllocation) {
     body.pixelRange = {

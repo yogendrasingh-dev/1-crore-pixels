@@ -20,7 +20,11 @@ export interface ContributionStatusResponse {
   anonymous?: boolean;
   amountRupees?: number;
   pixelRange?: PixelRange;
+  referralCode?: string;
   message?: string;
 }
 
 export const CONTRIBUTION_ID_STORAGE_KEY = "1crore-pixels:contributionId";
+// Set by the `/r/{code}` referral landing page (PRD §20, T9.3); read once at contribution
+// creation time so a referral survives navigating from the landing page to `/contribute`.
+export const REFERRAL_CODE_STORAGE_KEY = "1crore-pixels:referralCode";

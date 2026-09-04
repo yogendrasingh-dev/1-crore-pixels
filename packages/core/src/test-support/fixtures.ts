@@ -37,6 +37,7 @@ export interface TestContributionOverrides {
   amountPaise?: bigint;
   expiresAt?: Date;
   utrLast4?: string;
+  referralCodeUsed?: string;
 }
 
 export interface TestContribution {
@@ -59,6 +60,7 @@ export async function createTestContribution(
       contributorId: contributor.id,
       expiresAt: overrides.expiresAt,
       utrLast4: overrides.utrLast4,
+      referralCodeUsed: overrides.referralCodeUsed,
     },
   });
   return { contributor, contribution };

@@ -19,6 +19,8 @@ describe("POST /api/contributions (docs/API.md §2.1)", () => {
 
   afterEach(async () => {
     await prisma.contribution.deleteMany({ where: { id: { in: createdContributionIds } } });
+    // Every contribution creation also generates a referral code for its contributor (T9.3).
+    await prisma.referral.deleteMany({ where: { contributorId: { in: createdContributorIds } } });
     await prisma.contributor.deleteMany({ where: { id: { in: createdContributorIds } } });
     createdContributionIds.length = 0;
     createdContributorIds.length = 0;

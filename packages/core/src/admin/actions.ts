@@ -6,6 +6,7 @@
 // transactional home.
 import { prisma, type Contribution, type PrismaClient } from "@1crore-pixels/db";
 import { verifyAndAllocatePixels, type PixelAllocationResult } from "../pixel/allocation";
+import { recordReferralConversion } from "../referrals/attribution";
 import { rejectVerification } from "../state-machine/index";
 import { writeAuditLog } from "./audit";
 
@@ -19,7 +20,11 @@ export async function adminVerifyContribution(
   actor: AdminActor,
   db: PrismaClient = prisma,
 ): Promise<PixelAllocationResult | null> {
-  return verifyAndAllocatePixels(contributionId, db, actor);
+  const result = await verifyAndAllocatePixels(contributionId, db, actor);
+  // Best-effort, post-commit referral attribution (docs/PIXEL_SYSTEM.md §2.3, T9.4) —
+  // only reached once per contribution, since a raced/duplicate verify returns null above.
+  if (result) await recordReferralConversion(result.contribution, db);
+  return result;
 }
 
 export async function adminRejectContribution(

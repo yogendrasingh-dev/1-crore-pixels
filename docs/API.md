@@ -35,7 +35,7 @@ Headers: `Idempotency-Key: <client-generated-uuid>` (recommended; server generat
 
 **Server behavior:**
 - Validates `displayName` (length, character set, offensive/spam moderation queue per PRD §9.1), `amountRupees` (positive, within configured min/max — Open Decision, `docs/DATABASE.md` §9.3), `referralCode` (must exist if provided; invalid codes are ignored, not rejected, so a bad/stale referral link never blocks a contribution).
-- Creates `contributions` row with `status = CREATED`, creates a matching `contributors` row (`docs/DATABASE.md` §3.2).
+- Creates `contributions` row with `status = CREATED`, creates a matching `contributors` row (`docs/DATABASE.md` §3.2), and generates that contributor's own `referrals.code` (PRD §20) in the same transaction — anonymous contributors get a generic code base (e.g. `supporter-7f3a`) rather than one derived from their real name, so the public referral URL never leaks an otherwise-hidden identity.
 - If `referralCode` is valid, records a `referral_events(event_type = VISIT)` at the time of landing (see §2.7) and will record `CONTRIBUTION` once payment is verified — not at creation time, since creation alone is not a conversion.
 
 **Response `201`**
@@ -118,11 +118,12 @@ Status polling for the contribution flow's UI (so the frontend can show "waiting
   "displayName": "Rahul",
   "anonymous": false,
   "amountRupees": 101,
-  "pixelRange": { "start": 184201, "end": 184302, "count": 101 }
+  "pixelRange": { "start": 184201, "end": 184302, "count": 101 },
+  "referralCode": "rahul-7f3a"
 }
 ```
 
-`pixelRange` is present only once `status` is `PIXELS_ASSIGNED` or later. Never returned: `utrLast4`, `payment_reference`/provider fields, `rejectionReason` detail beyond a generic user-facing message if `VERIFICATION_FAILED` (the detailed reason is for admins only).
+`pixelRange` is present only once `status` is `PIXELS_ASSIGNED` or later. `referralCode` is the contributor's own referral code (PRD §19 "Share My Contribution," §20) — present once one exists (`docs/DATABASE.md` §3.2, §3.7; generated for every new contributor at `POST /api/contributions` time). Never returned: `utrLast4`, `payment_reference`/provider fields, `rejectionReason` detail beyond a generic user-facing message if `VERIFICATION_FAILED` (the detailed reason is for admins only).
 
 ---
 
@@ -216,6 +217,26 @@ Records a visit event (kept separate from the `GET` above so the `GET` stays cac
 ### 2.9 `GET /api/updates`, `GET /api/milestones`
 
 Public content listings (PRD §18, §17). Standard paginated read endpoints returning only `PUBLISHED` updates and configured milestones. No request/response detail beyond the fields in `docs/DATABASE.md` §3.10–3.11 is prescribed by the PRD.
+
+---
+
+### 2.10 `GET /api/leaderboard`
+
+Community referral leaderboard (PRD §20 "recognition instead" of cash commissions, §21 "Community leaderboard: Most referrals"). Ranks by verified conversions — `referral_events(event_type = CONTRIBUTION)` — not raw visit counts, since a visit alone is not a conversion (§2.1 above).
+
+Query params: `?limit=` (default 20, max 100).
+
+**Response `200`**
+```json
+{
+  "items": [
+    { "rank": 1, "displayName": "Rahul", "anonymous": false, "referralCount": 12 },
+    { "rank": 2, "displayName": "Anonymous", "anonymous": true, "referralCount": 9 }
+  ]
+}
+```
+
+`anonymous: true` entries always carry `displayName: "Anonymous"`, same rule as §2.6/§2.7. Never returned: referral codes, contributed amounts, contributor ids. Cache-Control: short TTL (`s-maxage=30, stale-while-revalidate=60`), same rationale as `GET /api/progress` (`docs/DEPLOYMENT.md` §5).
 
 ---
 

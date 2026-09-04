@@ -121,6 +121,26 @@ main {
   font-weight: 700;
 }
 
+.share-card {
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.share-card-campaign {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.75rem;
+  color: #666;
+}
+
+.share-card-name {
+  font-style: italic;
+  color: #666;
+}
+
 .pixel-wall-viewport {
   position: relative;
   width: 100%;

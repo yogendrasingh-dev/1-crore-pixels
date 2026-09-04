@@ -1,12 +1,20 @@
 "use client";
 
+import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { AmountStep } from "./AmountStep";
 import { NameStep, type NameStepValue } from "./NameStep";
 import { QrStep } from "./QrStep";
 import { SuccessStep } from "./SuccessStep";
 import { TerminalStep } from "./TerminalStep";
-import { CONTRIBUTION_ID_STORAGE_KEY, type ContributionStatusResponse, type FlowStep, type PixelRange, type QrData } from "./types";
+import {
+  CONTRIBUTION_ID_STORAGE_KEY,
+  REFERRAL_CODE_STORAGE_KEY,
+  type ContributionStatusResponse,
+  type FlowStep,
+  type PixelRange,
+  type QrData,
+} from "./types";
 import { UtrStep } from "./UtrStep";
 import { WaitingStep } from "./WaitingStep";
 
@@ -40,16 +48,31 @@ async function parseJsonResponse<T>(response: Response): Promise<T> {
 }
 
 export function ContributionFlow() {
+  const searchParams = useSearchParams();
   const [step, setStep] = useState<FlowStep>("name");
   const [nameValue, setNameValue] = useState<NameStepValue | null>(null);
   const [contributionId, setContributionId] = useState<string | null>(null);
   const [qrData, setQrData] = useState<QrData | null>(null);
   const [pixelRange, setPixelRange] = useState<PixelRange | undefined>(undefined);
+  // Read once, lazily, at mount — a `?ref=` query param (from the `/r/{code}` landing
+  // page, T9.3) takes precedence over a previously stored code. An unknown/stale code is
+  // validated server-side at creation time and simply ignored there, never rejected
+  // (docs/API.md §2.1), so no re-validation is needed here.
+  const [usedReferralCode] = useState<string | undefined>(() => {
+    if (typeof window === "undefined") return undefined;
+    return searchParams.get("ref") ?? window.localStorage.getItem(REFERRAL_CODE_STORAGE_KEY) ?? undefined;
+  });
+  const [ownReferralCode, setOwnReferralCode] = useState<string | undefined>(undefined);
   const [failureMessage, setFailureMessage] = useState<string>(GENERIC_FAILURE_MESSAGE);
   const [amountError, setAmountError] = useState<string | null>(null);
   const [utrError, setUtrError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const idempotencyKeyRef = useRef<string | null>(null);
+
+  // Persist a freshly-arrived `?ref=` so it survives navigating away from this page and back.
+  useEffect(() => {
+    if (usedReferralCode) window.localStorage.setItem(REFERRAL_CODE_STORAGE_KEY, usedReferralCode);
+  }, [usedReferralCode]);
 
   const resetFlow = useCallback(() => {
     window.localStorage.removeItem(CONTRIBUTION_ID_STORAGE_KEY);
@@ -57,6 +80,7 @@ export function ContributionFlow() {
     setContributionId(null);
     setQrData(null);
     setPixelRange(undefined);
+    setOwnReferralCode(undefined);
     setNameValue(null);
     setStep("name");
   }, []);
@@ -85,6 +109,7 @@ export function ContributionFlow() {
 
   const applyStatus = useCallback((data: ContributionStatusResponse) => {
     if (data.pixelRange) setPixelRange(data.pixelRange);
+    if (data.referralCode) setOwnReferralCode(data.referralCode);
     if (data.status === "VERIFICATION_FAILED") setFailureMessage(data.message ?? GENERIC_FAILURE_MESSAGE);
     setStep(stepForStatus(data.status));
   }, []);
@@ -147,6 +172,7 @@ export function ContributionFlow() {
           displayName: nameValue.displayName,
           anonymous: nameValue.anonymous,
           amountRupees,
+          ...(usedReferralCode ? { referralCode: usedReferralCode } : {}),
         }),
       });
 
@@ -216,7 +242,13 @@ export function ContributionFlow() {
     case "waiting":
       return <WaitingStep />;
     case "success":
-      return <SuccessStep pixelRange={pixelRange} />;
+      return (
+        <SuccessStep
+          pixelRange={pixelRange}
+          referralCode={ownReferralCode}
+          displayName={nameValue?.anonymous ? "Anonymous" : nameValue?.displayName}
+        />
+      );
     case "expired":
       return (
         <TerminalStep

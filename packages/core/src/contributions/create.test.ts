@@ -9,6 +9,9 @@ describe("createContribution (docs/API.md §2.1)", () => {
 
   afterEach(async () => {
     await prisma.contribution.deleteMany({ where: { id: { in: createdContributionIds } } });
+    // Every `createContribution` call also generates a referral code for its contributor
+    // (T9.3) — clean those up alongside any referrals created directly by a test.
+    await prisma.referral.deleteMany({ where: { contributorId: { in: createdContributorIds } } });
     await prisma.referral.deleteMany({ where: { id: { in: createdReferralIds } } });
     await prisma.contributor.deleteMany({ where: { id: { in: createdContributorIds } } });
     createdContributionIds.length = 0;
@@ -96,6 +99,37 @@ describe("createContribution (docs/API.md §2.1)", () => {
     createdContributorIds.push(contribution.contributorId);
 
     expect(contribution.status).toBe("CREATED");
+  });
+
+  it("generates a unique referral code for the new contributor (T9.3)", async () => {
+    const contribution = await createContribution({
+      displayName: "Referral Rahul",
+      anonymous: false,
+      amountPaise: 100n,
+    });
+    createdContributionIds.push(contribution.id);
+    createdContributorIds.push(contribution.contributorId);
+
+    const contributor = await prisma.contributor.findUniqueOrThrow({ where: { id: contribution.contributorId } });
+    expect(contributor.referralCode).toMatch(/^referral-rahul-[0-9a-f]{4}$/);
+
+    const referral = await prisma.referral.findUnique({ where: { code: contributor.referralCode! } });
+    createdReferralIds.push(referral!.id);
+    expect(referral?.contributorId).toBe(contributor.id);
+  });
+
+  it("uses a generic referral code base for anonymous contributions, never the real name", async () => {
+    const contribution = await createContribution({
+      displayName: "Secret Name",
+      anonymous: true,
+      amountPaise: 100n,
+    });
+    createdContributionIds.push(contribution.id);
+    createdContributorIds.push(contribution.contributorId);
+
+    const contributor = await prisma.contributor.findUniqueOrThrow({ where: { id: contribution.contributorId } });
+    expect(contributor.referralCode).toMatch(/^supporter-[0-9a-f]{4}$/);
+    createdReferralIds.push((await prisma.referral.findUniqueOrThrow({ where: { code: contributor.referralCode! } })).id);
   });
 
   it("forces anonymous contributions to still store the real name server-side", async () => {

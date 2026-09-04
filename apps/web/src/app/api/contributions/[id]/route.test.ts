@@ -25,6 +25,23 @@ describe("GET /api/contributions/{id} (docs/API.md §2.4)", () => {
     );
     expect(body).not.toHaveProperty("pixelRange");
     expect(body).not.toHaveProperty("utrLast4");
+    // The `test-support` fixture bypasses `createContribution`, so no referral code exists.
+    expect(body).not.toHaveProperty("referralCode");
+  });
+
+  it("includes the contributor's own referralCode once one has been generated", async () => {
+    fixture = await createTestContribution({ status: "VERIFYING" });
+    await prisma.contributor.update({
+      where: { id: fixture.contributor.id },
+      data: { referralCode: `test-ref-${fixture.contributor.id}` },
+    });
+
+    const response = await GET(new Request("http://localhost"), {
+      params: Promise.resolve({ id: fixture.contribution.publicCode }),
+    });
+    const body = await response.json();
+
+    expect(body.referralCode).toBe(`test-ref-${fixture.contributor.id}`);
   });
 
   it("includes pixelRange only once PIXELS_ASSIGNED", async () => {

@@ -51,6 +51,26 @@ describe("adminVerifyContribution (docs/API.md §4, docs/SECURITY.md §6)", () =
     });
     expect(audit).toHaveLength(0);
   });
+
+  it("records a best-effort referral CONTRIBUTION event when the contribution used a referral code (T9.4)", async () => {
+    const owner = await prisma.contributor.create({ data: { displayName: "Referral Owner" } });
+    const referral = await prisma.referral.create({
+      data: { code: `ref-attribution-${Date.now()}`, contributorId: owner.id },
+    });
+    fixture = await createTestContribution({ status: "VERIFYING", referralCodeUsed: referral.code });
+    admin = await createTestAdmin({ role: "VERIFIER" });
+
+    const result = await adminVerifyContribution(fixture.contribution.id, { adminUserId: admin.id });
+
+    expect(result?.contribution.status).toBe("PUBLISHED");
+    const events = await prisma.referralEvent.findMany({ where: { referralId: referral.id, eventType: "CONTRIBUTION" } });
+    expect(events).toHaveLength(1);
+    expect(events[0]?.contributionId).toBe(fixture.contribution.id);
+
+    await prisma.referralEvent.deleteMany({ where: { referralId: referral.id } });
+    await prisma.referral.delete({ where: { id: referral.id } });
+    await prisma.contributor.delete({ where: { id: owner.id } });
+  });
 });
 
 describe("adminRejectContribution (docs/API.md §4, docs/SECURITY.md §6)", () => {

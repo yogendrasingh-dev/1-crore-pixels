@@ -155,13 +155,13 @@ Goal: PRD §22's Content/Moderation admin capabilities exist. Depends on Phase 5
 
 Goal: PRD §19–§21 (sharing, referrals, gamification). Depends on Phases 6–7. Matches PRD Phase 2 scope.
 
-- [ ] **T9.1** Share card generation (campaign name, first name/Anonymous, pixel count/ID, CTA) per PRD §19.
-- [ ] **T9.2** Share actions: WhatsApp, X, copy link (PRD §19).
-- [ ] **T9.3** Referral link generation per contributor (`referrals.code`) and `/r/{code}` landing route calling `GET /api/referrals/{code}` + `POST .../visit` (PRD §20).
-- [ ] **T9.4** Referral attribution: pass `referralCode` through to `POST /api/contributions` and record a `CONTRIBUTION` referral event as a best-effort step immediately after the contribution's allocation transaction commits — not as an added step inside that transaction (`docs/API.md` §2.1, §2.8; `docs/PIXEL_SYSTEM.md` §2.3 "Non-critical side effects").
-- [ ] **T9.5** Badge award evaluation (Founding/Early Believer/Dream Builder/Million Pixel Club) against `badges.criteria`, triggered on contribution publish (PRD §21) — **exact thresholds/rules depend on `docs/DATABASE.md` §9's Open Decision #8 (PRD §36.12) being resolved first.**
-- [ ] **T9.6** Leaderboard (most referrals) (PRD §20, §21).
-- [ ] **T9.7** Badge/leaderboard display on contributor-facing UI.
+- [x] **T9.1** Share card generation (campaign name, first name/Anonymous, pixel count/ID, CTA) per PRD §19.
+- [x] **T9.2** Share actions: WhatsApp, X, copy link (PRD §19).
+- [x] **T9.3** Referral link generation per contributor (`referrals.code`) and `/r/{code}` landing route calling `GET /api/referrals/{code}` + `POST .../visit` (PRD §20).
+- [x] **T9.4** Referral attribution: pass `referralCode` through to `POST /api/contributions` and record a `CONTRIBUTION` referral event as a best-effort step immediately after the contribution's allocation transaction commits — not as an added step inside that transaction (`docs/API.md` §2.1, §2.8; `docs/PIXEL_SYSTEM.md` §2.3 "Non-critical side effects").
+- [ ] **T9.5** Badge award evaluation (Founding/Early Believer/Dream Builder/Million Pixel Club) against `badges.criteria`, triggered on contribution publish (PRD §21) — **exact thresholds/rules depend on `docs/DATABASE.md` §9's Open Decision #8 (PRD §36.12) being resolved first.** Not started — blocked, see Cross-Cutting gate below.
+- [x] **T9.6** Leaderboard (most referrals) (PRD §20, §21). New endpoint `GET /api/leaderboard` documented at `docs/API.md` §2.10.
+- [ ] **T9.7** Badge/leaderboard display on contributor-facing UI. Leaderboard display implemented and validated (`/leaderboard` page). Left incomplete: no badges exist to display until T9.5's Open Decision resolves, so the "Badge ... display" half of this task cannot be done yet.
 
 ---
 
