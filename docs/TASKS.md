@@ -61,10 +61,10 @@ Goal: state machine, allocation engine, and validation exist as pure, tested log
 
 Goal: the `PaymentProvider` interface and the MVP manual provider exist. Depends on Phase 2.
 
-- [ ] **T3.1** Define the `PaymentProvider` TypeScript interface in `packages/payment-providers` exactly as specified in `docs/PAYMENT.md` §4.
-- [ ] **T3.2** Implement `ManualUpiProvider.createPaymentRequest` — builds the UPI deep link and triggers QR image generation, per `docs/PAYMENT.md` §4.1 and `docs/API.md` §2.2.
-- [ ] **T3.3** Unit test `ManualUpiProvider` deep-link construction (correct `pa`/`pn`/`am`/`tr`/`cu` fields, `tr` = contribution's `public_code`).
-- [ ] **T3.4** Wire provider selection via configuration/DI so `apps/web` never imports a concrete provider directly, only the interface (`docs/PAYMENT.md` §4.3).
+- [x] **T3.1** Define the `PaymentProvider` TypeScript interface in `packages/payment-providers` exactly as specified in `docs/PAYMENT.md` §4.
+- [x] **T3.2** Implement `ManualUpiProvider.createPaymentRequest` — builds the UPI deep link and triggers QR image generation, per `docs/PAYMENT.md` §4.1 and `docs/API.md` §2.2.
+- [x] **T3.3** Unit test `ManualUpiProvider` deep-link construction (correct `pa`/`pn`/`am`/`tr`/`cu` fields, `tr` = contribution's `public_code`).
+- [x] **T3.4** Wire provider selection via configuration/DI so `apps/web` never imports a concrete provider directly, only the interface (`docs/PAYMENT.md` §4.3).
 
 ---
 

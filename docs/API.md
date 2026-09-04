@@ -76,6 +76,8 @@ Generates the payment attempt and dynamic UPI QR (PRD §11, §24 `POST /api/paym
 }
 ```
 
+`qrImageUrl` is a `data:image/png;base64,...` URI rendered server-side from `upiDeepLink` (`ManualUpiProvider`, `docs/PAYMENT.md` §4.1) — usable directly as an `<img>` `src` with no separate image-hosting endpoint required.
+
 Never returned: `provider`, `provider_payment_id`, any raw payment-provider payload.
 
 ---
