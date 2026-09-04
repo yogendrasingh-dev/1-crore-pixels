@@ -7,3 +7,68 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+// docs/DATABASE.md §4 — exact transition graph: docs/PAYMENT.md §2
+enum ContributionStatus {
+  CREATED
+  PAYMENT_PENDING
+  PAYMENT_SUBMITTED
+  VERIFYING
+  PAID
+  PIXELS_ASSIGNED
+  PUBLISHED
+  PAYMENT_FAILED
+  PAYMENT_EXPIRED
+  VERIFICATION_FAILED
+  REFUND_PENDING
+  REFUNDED
+
+  @@map("contribution_status")
+}
+
+// docs/DATABASE.md §3.2. One row per contribution in MVP (Open Decision #1: §9.1).
+model Contributor {
+  id                        BigInt   @id @default(autoincrement())
+  displayName               String   @map("display_name")
+  anonymous                 Boolean  @default(false)
+  referralCode              String?  @unique @map("referral_code")
+  totalVerifiedAmountPaise  BigInt   @default(0) @map("total_verified_amount_paise")
+  totalPixels               BigInt   @default(0) @map("total_pixels")
+  createdAt                 DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  contributions Contribution[]
+
+  @@map("contributors")
+}
+
+// docs/DATABASE.md §3.1. amount_paise > 0 CHECK and the partial display_name index
+// are added by raw SQL in the migration — Prisma's schema DSL doesn't express either.
+model Contribution {
+  id                  BigInt             @id @default(autoincrement())
+  publicCode          String             @unique @map("public_code")
+  displayName         String             @map("display_name")
+  anonymous           Boolean            @default(false)
+  amountPaise         BigInt             @map("amount_paise")
+  currency            String             @default("INR")
+  status              ContributionStatus
+  contributorId       BigInt             @map("contributor_id")
+  contributor         Contributor        @relation(fields: [contributorId], references: [id])
+  referralCodeUsed    String?            @map("referral_code_used")
+  utrLast4            String?            @map("utr_last4") @db.Char(4)
+  idempotencyKey      String?            @unique @map("idempotency_key")
+  ipHash              String?            @map("ip_hash")
+  userAgentHash       String?            @map("user_agent_hash")
+  rejectionReason     String?            @map("rejection_reason")
+  expiresAt           DateTime?          @map("expires_at") @db.Timestamptz
+  createdAt           DateTime           @default(now()) @map("created_at") @db.Timestamptz
+  paymentSubmittedAt  DateTime?          @map("payment_submitted_at") @db.Timestamptz
+  paidAt              DateTime?          @map("paid_at") @db.Timestamptz
+  verifiedAt          DateTime?          @map("verified_at") @db.Timestamptz
+  publishedAt         DateTime?          @map("published_at") @db.Timestamptz
+
+  @@index([status])
+  @@index([contributorId])
+  @@index([referralCodeUsed])
+  @@index([createdAt])
+  @@map("contributions")
+}

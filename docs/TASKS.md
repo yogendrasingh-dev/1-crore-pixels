@@ -26,7 +26,7 @@ Goal: a working, empty monorepo with tooling, schema, and CI in place. No produc
 
 Goal: the full schema from `docs/DATABASE.md` exists, migrated, and typed — no API or UI yet.
 
-- [ ] **T1.1** Define Prisma schema for `contributions` + `contributors` (`docs/DATABASE.md` §3.1–3.2), including the `contribution_status` enum (§4).
+- [x] **T1.1** Define Prisma schema for `contributions` + `contributors` (`docs/DATABASE.md` §3.1–3.2), including the `contribution_status` enum (§4).
 - [ ] **T1.2** Define Prisma schema for `payments`, including `payment_status` enum (`docs/DATABASE.md` §3.3, §4).
 - [ ] **T1.3** Define Prisma schema for `pixel_allocations` with the `int8range` generated column and GiST exclusion constraint (`docs/DATABASE.md` §3.4) — this constraint likely needs a raw SQL migration since Prisma does not natively express `EXCLUDE USING gist`; confirm and write it explicitly.
 - [ ] **T1.4** Define `pixel_cursor` and `campaign_totals` single-row tables with seed rows (`docs/DATABASE.md` §3.5–3.6).
