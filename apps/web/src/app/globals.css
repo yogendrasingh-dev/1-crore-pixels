@@ -6,3 +6,117 @@ body {
   margin: 0;
   font-family: system-ui, sans-serif;
 }
+
+main {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 24px 16px 64px;
+}
+
+.hero,
+.progress-section,
+.story-section,
+.flow-step {
+  margin-bottom: 32px;
+}
+
+.hero-headline {
+  font-size: 1.4rem;
+  font-weight: 600;
+}
+
+.hero-amount,
+.progress-amount {
+  font-size: 1.6rem;
+  font-weight: 700;
+}
+
+.cta-button {
+  display: inline-block;
+  padding: 12px 20px;
+  background: #111;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.progress-bar-track {
+  width: 100%;
+  height: 12px;
+  background: #eee;
+  border-radius: 6px;
+  overflow: hidden;
+  margin: 8px 0;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: #111;
+}
+
+.progress-stats {
+  display: flex;
+  gap: 24px;
+  margin: 12px 0;
+}
+
+.progress-stats > div {
+  display: flex;
+  flex-direction: column;
+}
+
+.flow-step {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 360px;
+}
+
+.flow-step input {
+  padding: 10px;
+  font-size: 1rem;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.field-error {
+  color: #b00020;
+}
+
+.amount-presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.amount-preset {
+  padding: 8px 14px;
+  border: 1px solid #ccc;
+  border-radius: 999px;
+  background: #fff;
+  cursor: pointer;
+}
+
+.amount-preset.selected {
+  background: #111;
+  color: #fff;
+  border-color: #111;
+}
+
+.flow-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.pixel-count {
+  font-size: 1.4rem;
+  font-weight: 700;
+}

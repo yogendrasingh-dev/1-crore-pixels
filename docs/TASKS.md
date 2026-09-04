@@ -110,16 +110,16 @@ Goal: admin login, RBAC, and the verification queue exist. Depends on Phase 2 (s
 
 Goal: the visitor-facing flow from PRD §8–§9 works end-to-end against the Phase 3–4 APIs.
 
-- [ ] **T6.1** Hero section: campaign name, ₹1 hook, goal, live totals, contributor count, primary CTA (PRD §8.1), backed by `GET /api/progress`.
-- [ ] **T6.2** Live progress display: raised amount, % funded, verified contributor count, pixels claimed, progress bar, last-updated timestamp (PRD §8.2).
-- [ ] **T6.3** Story section content block (PRD §8.3) — static content, admin-editable later if in scope (see Phase 8).
-- [ ] **T6.4** Display-name + anonymous-toggle step of the contribution flow (PRD §9.1), client-side validation mirroring `docs/SECURITY.md` §2 (server remains authoritative).
-- [ ] **T6.5** Amount selection step with presets + custom amount (PRD §9.2), ₹1 kept as the visually primary option.
-- [ ] **T6.6** Contribution creation call (`POST /api/contributions`) + transition to QR display.
-- [ ] **T6.7** Dynamic QR display screen, rendering `upiDeepLink`/`qrImageUrl` from `POST /api/contributions/{id}/qr`, with an expiry countdown reflecting `expiresAt` (PRD §11).
-- [ ] **T6.8** UTR last-4 submission screen (PRD §12), calling `POST /api/contributions/{id}/utr`, followed by a "waiting for verification" state that polls `GET /api/contributions/{id}`.
-- [ ] **T6.9** Success screen: pixel range/count display, "View My Pixels," share actions entry points (PRD §19) — share mechanics themselves are Phase 8.
-- [ ] **T6.10** Handle every non-happy-path UI state: `PAYMENT_EXPIRED`, `VERIFICATION_FAILED`, still-`VERIFYING` after reload (PRD §34 "browser closes" case).
+- [x] **T6.1** Hero section: campaign name, ₹1 hook, goal, live totals, contributor count, primary CTA (PRD §8.1), backed by `GET /api/progress`.
+- [x] **T6.2** Live progress display: raised amount, % funded, verified contributor count, pixels claimed, progress bar, last-updated timestamp (PRD §8.2).
+- [x] **T6.3** Story section content block (PRD §8.3) — static content, admin-editable later if in scope (see Phase 8).
+- [x] **T6.4** Display-name + anonymous-toggle step of the contribution flow (PRD §9.1), client-side validation mirroring `docs/SECURITY.md` §2 (server remains authoritative).
+- [x] **T6.5** Amount selection step with presets + custom amount (PRD §9.2), ₹1 kept as the visually primary option.
+- [x] **T6.6** Contribution creation call (`POST /api/contributions`) + transition to QR display.
+- [x] **T6.7** Dynamic QR display screen, rendering `upiDeepLink`/`qrImageUrl` from `POST /api/contributions/{id}/qr`, with an expiry countdown reflecting `expiresAt` (PRD §11).
+- [x] **T6.8** UTR last-4 submission screen (PRD §12), calling `POST /api/contributions/{id}/utr`, followed by a "waiting for verification" state that polls `GET /api/contributions/{id}`.
+- [x] **T6.9** Success screen: pixel range/count display, "View My Pixels," share actions entry points (PRD §19) — share mechanics themselves are Phase 8.
+- [x] **T6.10** Handle every non-happy-path UI state: `PAYMENT_EXPIRED`, `VERIFICATION_FAILED`, still-`VERIFYING` after reload (PRD §34 "browser closes" case).
 
 ---
 

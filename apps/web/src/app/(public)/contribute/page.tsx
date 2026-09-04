@@ -1,3 +1,9 @@
+import { ContributionFlow } from "./ContributionFlow";
+
 export default function ContributePage() {
-  return <main>Contribution Flow — implemented in Phase 6 (docs/TASKS.md).</main>;
+  return (
+    <main className="contribute-page">
+      <ContributionFlow />
+    </main>
+  );
 }

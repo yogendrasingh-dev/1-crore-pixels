@@ -1,11 +1,13 @@
-import { Button } from "@1crore-pixels/ui";
+import { Hero } from "./_components/Hero";
+import { LiveProgressSection } from "./_components/LiveProgressSection";
+import { StorySection } from "./_components/StorySection";
 
 export default function HomePage() {
   return (
     <main>
-      <h1>1 Crore Pixels</h1>
-      <p>Foundation scaffold — content lands in Phase 6 (docs/TASKS.md).</p>
-      <Button>Contribute</Button>
+      <Hero />
+      <LiveProgressSection />
+      <StorySection />
     </main>
   );
 }
